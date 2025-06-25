@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
 from .forms import UserRegistrationForm
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.contrib.auth import logout
+from .models import Curso
 
 
 def register(request):
@@ -33,3 +35,14 @@ class CustomLoginView(LoginView):
         else:
             messages.error(self.request, 'Sua conta ainda não foi aprovada por um administrador.')
             return self.form_invalid(form)
+
+
+@login_required
+def listar_cursos(request):
+    cursos = Curso.objects.all()
+
+    context = {
+        'cursos': cursos,
+    }
+
+    return render(request, 'cursos/listar_cursos.html', context=context)
