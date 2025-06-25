@@ -45,4 +45,4 @@ def listar_cursos(request):
         'cursos': cursos,
     }
 
-    return render(request, 'cursos/listar_cursos.html', context=context)
+    return render(request, 'cursos/lista_cursos.html', context=context)
