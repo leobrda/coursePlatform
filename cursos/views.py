@@ -86,3 +86,8 @@ def editar_perfil(request):
         form = UserEditForm(instance=request.user)
 
     return render(request, 'cursos/editar_perfil.html', {'form': form})
+
+
+def logout_view(request):
+    logout(request)
+    return redirect('cursos:login')
