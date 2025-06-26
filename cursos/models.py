@@ -27,7 +27,11 @@ class Aula(models.Model):
     curso = models.ForeignKey(Curso, related_name='aulas', on_delete=models.CASCADE, verbose_name='Curso')
     titulo = models.CharField(max_length=350, verbose_name='Título da Aula')
     descricao = models.TextField(verbose_name='Descrição da Aula')
-    link_video = models.URLField(verbose_name='Link do Vídeo')
+    youtube_video_id = models.CharField(
+        max_length=100,
+        verbose_name='ID do vídeo no Youtube',
+        help_text='Cole aqui apenas o código do vídeo, não a URL completa. Ex: dQw4w9WgXcQ'
+    )
     material_apoio = models.FileField(upload_to='cursos/materiais/', verbose_name='Material de Apoio', blank=True, null=True)
     ordem = models.PositiveIntegerField(verbose_name='Ordem')
 
