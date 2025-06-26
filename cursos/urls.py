@@ -1,6 +1,6 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from .views import CustomLoginView, register, register_done
+from .views import CustomLoginView, register, register_done, detalhe_curso
 
 app_name = 'cursos'
 
@@ -10,4 +10,6 @@ urlpatterns = [
 
     path('login/', CustomLoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='cursos:login'), name='logout'),
+
+    path('curso/<int:pk>/', detalhe_curso, name='detalhe_curso'),
 ]

@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .forms import UserRegistrationForm
 from django.contrib.auth.views import LoginView
@@ -46,3 +46,14 @@ def listar_cursos(request):
     }
 
     return render(request, 'cursos/lista_cursos.html', context=context)
+
+
+@login_required
+def detalhe_curso(request, pk):
+    curso = get_object_or_404(Curso, pk=pk)
+
+    context = {
+        'curso': curso,
+    }
+
+    return render(request, 'cursos/detalhe_curso.html', context=context)
