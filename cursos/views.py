@@ -13,7 +13,7 @@ def register(request):
 
         if form.is_valid():
             form.save()
-            return redirect('registrar_concluido')
+            return redirect('cursos:registrar_concluido')
     else:
         form = UserRegistrationForm()
 
