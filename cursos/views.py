@@ -4,7 +4,7 @@ from .forms import UserRegistrationForm
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.contrib.auth import logout
-from .models import Curso
+from .models import Curso, Aula
 
 
 def register(request):
@@ -57,3 +57,21 @@ def detalhe_curso(request, pk):
     }
 
     return render(request, 'cursos/detalhe_curso.html', context=context)
+
+
+@login_required
+def ver_aula(request, pk):
+    aula = get_object_or_404(Aula, pk=pk)
+
+    embed_url = None
+    if "youtube.com/watch?v=" in aula.link_video:
+        video_id = aula.link_video.split('v=')[1]
+        embed_url = f"https://www.youtube.com/embed/{video_id}"
+
+    contexto = {
+        'aula': aula,
+        'embed_url': embed_url,
+    }
+
+    return render(request, 'cursos/ver_aula.html', contexto)
+
