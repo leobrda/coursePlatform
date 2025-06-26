@@ -37,7 +37,7 @@
         <div class="course-grid">
             <!-- Aqui começa o loop para mostrar cada curso -->
             {% for curso in cursos %}
-                <a href="#" class="course-card">
+                <a href="{% url 'cursos:detalhe_curso' pk=curso.pk %}" class="course-card">
                     <!-- Mostra a imagem de capa do curso -->
                     {% if curso.imagem_capa %}
                         <img src="{{ curso.imagem_capa.url }}" alt="Capa do curso {{ curso.titulo }}">
