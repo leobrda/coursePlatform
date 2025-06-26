@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-g">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Associado - Plataforma de Cursos</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f4f4f9; color: #333; margin: 0; padding: 2em; display: flex; justify-content: center; align-items: center; min-height: 100vh;}
+        .container { background: #fff; padding: 2em; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-width: 500px; width: 100%;}
+        h1 { text-align: center; color: #4a4a4a; }
+        form p { display: flex; flex-direction: column; margin-bottom: 1em; }
+        form label { margin-bottom: 0.5em; font-weight: bold; }
+        form input, form textarea { padding: 0.8em; border: 1px solid #ddd; border-radius: 4px; font-size: 1em; }
+        .btn { background-color: #007bff; color: white; padding: 1em; border: none; border-radius: 4px; cursor: pointer; font-size: 1em; width: 100%;}
+        .btn:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cadastro de Novo Associado</h1>
+        <form method="post">
+            <!-- Token de segurança obrigatório do Django -->
+            {% csrf_token %}
+
+            <!-- Renderiza o formulário que passamos pela view -->
+            {{ form.as_p }}
+
+            <button type="submit" class="btn">Finalizar Cadastro</button>
+        </form>
+    </div>
+</body>
+</html>
