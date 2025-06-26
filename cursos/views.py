@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .forms import UserRegistrationForm
+from .forms import UserRegistrationForm, UserEditForm
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.contrib.auth import logout
@@ -73,3 +73,16 @@ def ver_aula(request, pk):
 
     return render(request, 'cursos/ver_aula.html', contexto)
 
+
+@login_required
+def editar_perfil(request):
+    if request.method == 'POST':
+        form = UserEditForm(instance=request.user, data=request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Perfil atualizado com sucesso!')
+            return redirect('cursos:editar_perfil')
+    else:
+        form = UserEditForm(instance=request.user)
+
+    return render(request, 'cursos/editar_perfil.html', {'form': form})

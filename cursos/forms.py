@@ -32,3 +32,27 @@ class UserRegistrationForm(forms.ModelForm):
                 biografia=self.cleaned_data.get('biografia', '')
             )
         return user
+
+
+class UserEditForm(forms.ModelForm):
+    biografia = forms.CharField(label='Biografia', widget=forms.Textarea, required=False)
+
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'email')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if hasattr(self.instance, 'associado'):
+            self.fields['biografia'].initial = self.instance.associado.biografia
+
+    def save(self, commit=True):
+        user = super().save(commit=commit)
+
+        if hasattr(user, 'associado'):
+            user.associado.biografia = self.cleaned_data['biografia']
+            if commit:
+                user.associado.save()
+
+        return user

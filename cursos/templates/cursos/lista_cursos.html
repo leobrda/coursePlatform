@@ -24,9 +24,9 @@
     <header class="header">
         <h1>Plataforma de Cursos</h1>
         <div class="user-info">
-            <!-- Verifica se o usuário está logado -->
             {% if user.is_authenticated %}
                 <span>Olá, {{ user.first_name }}!</span>
+                <a href="{% url 'cursos:editar_perfil' %}">Minha Conta</a>
                 <a href="{% url 'cursos:logout' %}">Sair</a>
             {% endif %}
         </div>
