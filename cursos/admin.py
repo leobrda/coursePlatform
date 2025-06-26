@@ -1,7 +1,9 @@
+from django import forms
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 from .models import Associado, Curso, Aula
+from urllib.parse import urlparse, parse_qs
 
 
 class AssociadoInline(admin.StackedInline):
@@ -25,8 +27,50 @@ admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 
 
+class AulaAdminForm(forms.ModelForm):
+    video_url = forms.URLField(label="URL do Vídeo no YouTube", required=False,
+                               help_text="Cole a URL completa do vídeo do YouTube aqui.")
+
+    class Meta:
+        model = Aula
+        fields = ['curso', 'titulo', 'descricao', 'video_url', 'material_apoio', 'ordem']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk and self.instance.youtube_video_id:
+            self.fields['video_url'].initial = f"https://www.youtube.com/watch?v={self.instance.youtube_video_id}"
+
+    def clean_video_url(self):
+        url = self.cleaned_data.get('video_url')
+        if not url:
+            return ''
+
+        try:
+            parsed_url = urlparse(url)
+            if 'youtube.com' in parsed_url.netloc:
+                query = parse_qs(parsed_url.query)
+                # O ID do vídeo é o valor do parâmetro 'v'
+                return query.get('v', [None])[0]
+            elif 'youtu.be' in parsed_url.netloc:
+                # Em URLs encurtadas, o ID é o caminho
+                return parsed_url.path.lstrip('/')
+        except Exception:
+            pass
+
+        raise forms.ValidationError("URL do YouTube inválida ou não reconhecida.")
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.youtube_video_id = self.cleaned_data.get('video_url') or ''
+
+        if commit:
+            instance.save()
+        return instance
+
+
 class AulaInline(admin.TabularInline):
     model = Aula
+    form = AulaAdminForm
     extra = 1
 
 
