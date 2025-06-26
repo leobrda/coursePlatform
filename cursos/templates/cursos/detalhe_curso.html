@@ -33,6 +33,7 @@
         <div class="user-info">
             {% if user.is_authenticated %}
                 <span>Olá, {{ user.first_name }}!</span>
+                <a href="{% url 'cursos:editar_perfil' %}">Minha Conta</a>
                 <a href="{% url 'cursos:logout' %}">Sair</a>
             {% endif %}
         </div>
