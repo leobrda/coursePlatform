@@ -60,9 +60,13 @@ class Resposta(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Usuário")
     conteudo = models.TextField(verbose_name="Conteúdo da Resposta")
     data_criacao = models.DateTimeField(auto_now_add=True)
+    votos = models.ManyToManyField(User, related_name='respostas_votadas', blank=True, verbose_name="Votos")
 
     class Meta:
         ordering = ['data_criacao']
 
     def __str__(self):
         return f'Resposta de {self.usuario.username} à pergunta "{self.pergunta.id}"'
+
+    def total_votos(self):
+        return self.votos.count()
