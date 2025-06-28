@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .forms import UserRegistrationForm, UserEditForm, PerguntaForm
+from .forms import UserRegistrationForm, UserEditForm, PerguntaForm, RespostaForm
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.contrib.auth import logout
-from .models import Curso, Aula, Pergunta
+from .models import Curso, Aula, Pergunta, Resposta
 
 
 def register(request):
@@ -105,3 +105,18 @@ def editar_perfil(request):
 def logout_view(request):
     logout(request)
     return redirect('cursos:login')
+
+
+@login_required
+def adicionar_resposta(request, pk_pergunta):
+    pergunta = get_object_or_404(Pergunta, pk=pk_pergunta)
+
+    if request.method == 'POST':
+        form_resposta = RespostaForm(request.POST)
+        if form_resposta.is_valid():
+            nova_resposta = form_resposta.save(commit=False)
+            nova_resposta.pergunta = pergunta
+            nova_resposta.usuario = request.user
+            nova_resposta.save()
+
+    return redirect('cursos:ver_aula', pk=pergunta.aula.pk)

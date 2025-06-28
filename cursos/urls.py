@@ -1,6 +1,6 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from .views import CustomLoginView, register, register_done, detalhe_curso, ver_aula, editar_perfil, logout_view
+from .views import CustomLoginView, register, register_done, detalhe_curso, ver_aula, editar_perfil, logout_view, adicionar_resposta
 
 app_name = 'cursos'
 
@@ -13,6 +13,7 @@ urlpatterns = [
 
     path('curso/<int:pk>/', detalhe_curso, name='detalhe_curso'),
     path('aula/<int:pk>/', ver_aula, name='ver_aula'),
+    path('pergunta/<int:pk_pergunta>/responder/', adicionar_resposta, name='adicionar_resposta'),
 
     path('minha-conta/', editar_perfil, name='editar_perfil'),
 ]
