@@ -36,6 +36,14 @@
         .replies-container { border-left: 3px solid #007bff; margin-top: 1.5em; padding-left: 1.5em; }
         .reply { margin-bottom: 1em; }
         .reply-form { margin-top: 1em; }
+
+         /* Estilos para o sistema de votos */
+        .reply-content { flex-grow: 1; }
+        .reply-footer { display: flex; align-items: center; gap: 1em; margin-top: 1em; }
+        .vote-button { display: inline-flex; align-items: center; gap: 0.5em; padding: 0.4em 0.8em; text-decoration: none; border-radius: 20px; font-weight: bold; font-size: 0.9em; border: 1px solid #ddd;}
+        .vote-button.voted { background-color: #007bff; color: white; border-color: #007bff;}
+        .vote-button.not-voted { background-color: #f8f9fa; color: #343a40;}
+        .vote-count { font-weight: bold; color: #6c757d; }
     </style>
 </head>
 <body>
@@ -102,14 +110,23 @@
 
                         <!-- Container para as respostas e o formulário de resposta -->
                         <div class="replies-container">
-                            <!-- Loop para listar as respostas existentes -->
-                            {% for resposta in pergunta.respostas.all %}
+                            {% for resposta in pergunta.respostas.all|dictsortreversed:"votos.count" %}
                                 <div class="reply">
                                     <p>
                                         <span class="reply-author">{{ resposta.usuario.first_name }} {{ resposta.usuario.last_name }}</span>
                                         <span class="reply-date">respondeu em {{ resposta.data_criacao|date:"d/m/Y" }}</span>
                                     </p>
-                                    <p class="reply-content">{{ resposta.conteudo }}</p>
+                                    <div class="reply-content">{{ resposta.conteudo|linebreaks }}</div>
+
+                                    <!-- NOVO: rodapé da resposta com o botão de voto -->
+                                    <div class="reply-footer">
+                                        {% if user in resposta.votos.all %}
+                                            <a href="{% url 'cursos:votar_resposta' pk_resposta=resposta.pk %}" class="vote-button voted">✔ Gostei</a>
+                                        {% else %}
+                                            <a href="{% url 'cursos:votar_resposta' pk_resposta=resposta.pk %}" class="vote-button not-voted">👍 Gostei</a>
+                                        {% endif %}
+                                        <span class="vote-count">{{ resposta.total_votos }} voto{{ resposta.total_votos|pluralize }}</span>
+                                    </div>
                                 </div>
                             {% endfor %}
 
