@@ -123,3 +123,15 @@ def adicionar_resposta(request, pk_pergunta):
             nova_resposta.save()
 
     return redirect('cursos:ver_aula', pk=pergunta.aula.pk)
+
+
+@login_required
+def votar_resposta(request, pk_resposta):
+    resposta = get_object_or_404(Resposta, pk=pk_resposta)
+
+    if resposta.votos.filter(id=request.user.id).exists():
+        resposta.votos.remove(request.user)
+    else:
+        resposta.votos.add(request.user)
+
+    return redirect('cursos:ver_aula', pk=resposta.pergunta.aula.pk)

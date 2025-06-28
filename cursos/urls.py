@@ -14,6 +14,7 @@ urlpatterns = [
     path('curso/<int:pk>/', detalhe_curso, name='detalhe_curso'),
     path('aula/<int:pk>/', ver_aula, name='ver_aula'),
     path('pergunta/<int:pk_pergunta>/responder/', adicionar_resposta, name='adicionar_resposta'),
+    path('resposta/<int:pk_resposta>/votar/', votar_resposta, name='votar_resposta'),
 
     path('minha-conta/', editar_perfil, name='editar_perfil'),
 ]
