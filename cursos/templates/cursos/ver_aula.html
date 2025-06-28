@@ -65,6 +65,31 @@
                 {% endif %}
             </div>
         </div>
+
+        <div class="qa-section">
+            <h2>Perguntas e Discussões</h2>
+
+            <!-- Formulário para fazer uma nova pergunta -->
+            <form method="post" class="question-form">
+                {% csrf_token %}
+                {{ form_pergunta.as_p }}
+                <button type="submit" class="btn-submit">Enviar Pergunta</button>
+            </form>
+
+            <!-- Lista de perguntas existentes -->
+            <div class="question-list">
+                {% for pergunta in perguntas %}
+                    <div class="question">
+                        <span class="question-author">{{ pergunta.usuario.first_name }} {{ pergunta.usuario.last_name }}</span>
+                        <span class="question-date">perguntou em {{ pergunta.data_criacao|date:"d/m/Y" }}</span>
+                        <p class="question-content">{{ pergunta.conteudo }}</p>
+                        <!-- Futuramente, aqui entrarão as respostas -->
+                    </div>
+                {% empty %}
+                    <p>Ainda não há perguntas para esta aula. Seja o primeiro a perguntar!</p>
+                {% endfor %}
+            </div>
+        </div>
     </main>
 
 </body>

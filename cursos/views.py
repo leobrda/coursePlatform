@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .forms import UserRegistrationForm, UserEditForm
+from .forms import UserRegistrationForm, UserEditForm, PerguntaForm
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.contrib.auth import logout
-from .models import Curso, Aula
+from .models import Curso, Aula, Pergunta
 
 
 def register(request):
@@ -60,18 +60,32 @@ def detalhe_curso(request, pk):
 
 
 @login_required
-@login_required
 def ver_aula(request, pk):
     aula = get_object_or_404(Aula, pk=pk)
 
+    if request.method == 'POST':
+        form_pergunta = PerguntaForm(request.POST)
+        if form_pergunta.is_valid():
+            nova_pergunta = form_pergunta.save(commit=False)
+            nova_pergunta.aula = aula
+            nova_pergunta.usuario = request.user
+            nova_pergunta.save()
+            return redirect('cursos:ver_aula', pk=aula.pk)
+    else:
+        form_pergunta = PerguntaForm()
+
+    perguntas_da_aula = Pergunta.objects.filter(aula=aula)
+
     embed_url = f"https://www.youtube.com/embed/{aula.youtube_video_id}"
 
-    contexto = {
+    context = {
         'aula': aula,
         'embed_url': embed_url,
+        'perguntas': perguntas_da_aula,
+        'form_pergunta': form_pergunta,
     }
 
-    return render(request, 'cursos/ver_aula.html', contexto)
+    return render(request, 'cursos/ver_aula.html', context=context)
 
 
 @login_required
