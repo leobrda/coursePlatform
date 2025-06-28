@@ -1,6 +1,6 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from .views import CustomLoginView, register, register_done, detalhe_curso, ver_aula, editar_perfil, logout_view, adicionar_resposta
+from .views import CustomLoginView, register, register_done, detalhe_curso, ver_aula, editar_perfil, logout_view, adicionar_resposta, votar_resposta
 
 app_name = 'cursos'
 
