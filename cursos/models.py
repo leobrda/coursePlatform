@@ -40,3 +40,29 @@ class Aula(models.Model):
 
     def __str__(self):
         return f'{self.curso.titulo} - Aula {self.ordem}: {self.titulo}'
+
+
+class Pergunta(models.Model):
+    aula = models.ForeignKey(Aula, related_name='perguntas', on_delete=models.CASCADE, verbose_name="Aula")
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Usuário")
+    conteudo = models.TextField(verbose_name="Conteúdo da Pergunta")
+    data_criacao = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['data_criacao']
+
+    def __str__(self):
+        return f'Pergunta de {self.usuario.username} na aula "{self.aula.titulo}"'
+
+
+class Resposta(models.Model):
+    pergunta = models.ForeignKey(Pergunta, related_name='respostas', on_delete=models.CASCADE, verbose_name="Pergunta")
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Usuário")
+    conteudo = models.TextField(verbose_name="Conteúdo da Resposta")
+    data_criacao = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['data_criacao']
+
+    def __str__(self):
+        return f'Resposta de {self.usuario.username} à pergunta "{self.pergunta.id}"'
