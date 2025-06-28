@@ -63,7 +63,7 @@ def detalhe_curso(request, pk):
 def ver_aula(request, pk):
     aula = get_object_or_404(Aula, pk=pk)
 
-    if request.method == 'POST':
+    if 'conteudo' in request.POST and request.resolver_match.url_name == 'ver_aula':
         form_pergunta = PerguntaForm(request.POST)
         if form_pergunta.is_valid():
             nova_pergunta = form_pergunta.save(commit=False)
@@ -74,18 +74,21 @@ def ver_aula(request, pk):
     else:
         form_pergunta = PerguntaForm()
 
-    perguntas_da_aula = Pergunta.objects.filter(aula=aula)
+    perguntas_da_aula = Pergunta.objects.filter(aula=aula).prefetch_related('respostas__usuario')
+
+    form_resposta = RespostaForm()
 
     embed_url = f"https://www.youtube.com/embed/{aula.youtube_video_id}"
 
-    context = {
+    contexto = {
         'aula': aula,
         'embed_url': embed_url,
         'perguntas': perguntas_da_aula,
         'form_pergunta': form_pergunta,
+        'form_resposta': form_resposta,
     }
 
-    return render(request, 'cursos/ver_aula.html', context=context)
+    return render(request, 'cursos/ver_aula.html', contexto)
 
 
 @login_required
