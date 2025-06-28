@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Associado
+from .models import Associado, Pergunta, Resposta
 
 
 class UserRegistrationForm(forms.ModelForm):
@@ -56,3 +56,27 @@ class UserEditForm(forms.ModelForm):
                 user.associado.save()
 
         return user
+
+
+class PerguntaForm(forms.ModelForm):
+    class Meta:
+        model = Pergunta
+        fields = ['conteudo']
+        widgets = {
+            'conteudo': forms.Textarea(attrs={'placeholder': 'Digite sua pergunta aqui...', 'rows': 4}),
+        }
+        labels = {
+            'conteudo': 'Sua Pergunta'
+        }
+
+
+class RespostaForm(forms.ModelForm):
+    class Meta:
+        model = Resposta
+        fields = ['conteudo']
+        widgets = {
+            'conteudo': forms.Textarea(attrs={'placeholder': 'Digite sua resposta...', 'rows': 3}),
+        }
+        labels = {
+            'conteudo': ''
+        }
