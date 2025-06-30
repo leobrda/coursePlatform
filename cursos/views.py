@@ -71,24 +71,33 @@ def detalhe_curso(request, pk):
 def ver_aula(request, pk):
     aula = get_object_or_404(Aula, pk=pk)
 
-    if 'conteudo' in request.POST and request.resolver_match.url_name == 'ver_aula':
-        form_pergunta = PerguntaForm(request.POST)
-        if form_pergunta.is_valid():
-            nova_pergunta = form_pergunta.save(commit=False)
-            nova_pergunta.aula = aula
-            nova_pergunta.usuario = request.user
-            nova_pergunta.save()
-            return redirect('cursos:ver_aula', pk=aula.pk)
-    else:
-        form_pergunta = PerguntaForm()
+    if request.method == 'POST':
+        if 'submit_pergunta' in request.POST:
+            form_pergunta = PerguntaForm(request.POST)
+            if form_pergunta.is_valid():
+                nova_pergunta = form_pergunta.save(commit=False)
+                nova_pergunta.aula = aula
+                nova_pergunta.usuario = request.user
+                nova_pergunta.save()
+                return redirect('cursos:ver_aula', pk=aula.pk)
+        elif 'submit_reposta' in request.POST:
+            form_resposta = RespostaForm(request.POST)
+            pergunta_id = request.POST.get('pergunta_id')
+            if form_resposta.is_valid() and pergunta_id:
+                pergunta = get_object_or_404(Pergunta, pk=pergunta_id)
+                nova_resposta = form_resposta.save(commit=False)
+                nova_resposta.pergunta = pergunta
+                nova_resposta.usuario = request.user
+                nova_resposta.save()
+                return redirect('cursos:ver_aula', pk=aula.pk)
 
-    perguntas_da_aula = Pergunta.objects.filter(aula=aula).prefetch_related('respostas__usuario')
-
+    form_pergunta = PerguntaForm()
     form_resposta = RespostaForm()
+    perguntas_da_aula = Pergunta.objects.filter(aula=aula).prefetch_related('respostas__usuario', 'respostas__votos')
 
     embed_url = f"https://www.youtube.com/embed/{aula.youtube_video_id}"
 
-    contexto = {
+    context = {
         'aula': aula,
         'embed_url': embed_url,
         'perguntas': perguntas_da_aula,
@@ -96,7 +105,7 @@ def ver_aula(request, pk):
         'form_resposta': form_resposta,
     }
 
-    return render(request, 'cursos/ver_aula.html', contexto)
+    return render(request, 'cursos/ver_aula.html', context=context)
 
 
 @login_required
@@ -117,20 +126,6 @@ def logout_view(request):
     logout(request)
     return redirect('cursos:login')
 
-
-@login_required
-def adicionar_resposta(request, pk_pergunta):
-    pergunta = get_object_or_404(Pergunta, pk=pk_pergunta)
-
-    if request.method == 'POST':
-        form_resposta = RespostaForm(request.POST)
-        if form_resposta.is_valid():
-            nova_resposta = form_resposta.save(commit=False)
-            nova_resposta.pergunta = pergunta
-            nova_resposta.usuario = request.user
-            nova_resposta.save()
-
-    return redirect('cursos:ver_aula', pk=pergunta.aula.pk)
 
 
 @login_required

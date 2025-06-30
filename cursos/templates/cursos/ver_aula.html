@@ -75,10 +75,12 @@
             <p>{{ aula.descricao }}</p>
             <div class="lesson-actions">
                 <div>
-                    {% if aula in user.associado.aulas_concluidas.all %}
-                        <a href="{% url 'cursos:marcar_aula_concluida' pk_aula=aula.pk %}" class="completion-button completed">✔ Aula Concluída</a>
-                    {% else %}
-                        <a href="{% url 'cursos:marcar_aula_concluida' pk_aula=aula.pk %}" class="completion-button not-completed">Marcar como Concluída</a>
+                    {% if user.is_authenticated and user.associado %}
+                        {% if aula in user.associado.aulas_concluidas.all %}
+                            <a href="{% url 'cursos:marcar_aula_concluida' pk_aula=aula.pk %}" class="completion-button completed">✔ Aula Concluída</a>
+                        {% else %}
+                            <a href="{% url 'cursos:marcar_aula_concluida' pk_aula=aula.pk %}" class="completion-button not-completed">Marcar como Concluída</a>
+                        {% endif %}
                     {% endif %}
                 </div>
                 {% if aula.material_apoio %}
@@ -89,10 +91,11 @@
 
         <div class="qa-section">
             <h2>Perguntas e Discussões</h2>
+            <!-- Formulário de Pergunta ATUALIZADO para a lógica unificada -->
             <form method="post" class="question-form" action="{% url 'cursos:ver_aula' pk=aula.pk %}">
                 {% csrf_token %}
                 {{ form_pergunta.as_p }}
-                <button type="submit" class="btn-submit">Enviar Pergunta</button>
+                <button type="submit" name="submit_pergunta" class="btn-submit">Enviar Pergunta</button>
             </form>
 
             <div class="question-list">
@@ -112,7 +115,6 @@
                                         <span class="reply-date">respondeu em {{ resposta.data_criacao|date:"d/m/Y" }}</span>
                                     </p>
                                     <div class="reply-content">{{ resposta.conteudo|linebreaks }}</div>
-
                                     <div class="reply-footer">
                                         {% if user in resposta.votos.all %}
                                             <a href="{% url 'cursos:votar_resposta' pk_resposta=resposta.pk %}" class="vote-button voted">✔ Gostei</a>
@@ -124,10 +126,12 @@
                                 </div>
                             {% endfor %}
 
-                            <form method="post" action="{% url 'cursos:adicionar_resposta' pk_pergunta=pergunta.pk %}" class="reply-form">
+                            <!-- Formulário de Resposta ATUALIZADO para a lógica unificada -->
+                            <form method="post" action="{% url 'cursos:ver_aula' pk=aula.pk %}" class="reply-form">
                                 {% csrf_token %}
+                                <input type="hidden" name="pergunta_id" value="{{ pergunta.pk }}">
                                 {{ form_resposta.as_p }}
-                                <button type="submit" class="btn-submit" style="padding: 0.5em 1em; font-size: 0.9em;">Responder</button>
+                                <button type="submit" name="submit_resposta" class="btn-submit" style="padding: 0.5em 1em; font-size: 0.9em;">Responder</button>
                             </form>
                         </div>
                     </div>
