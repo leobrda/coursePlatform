@@ -91,7 +91,7 @@
 
         <div class="qa-section">
             <h2>Perguntas e Discussões</h2>
-            <!-- Formulário de Pergunta ATUALIZADO para a lógica unificada -->
+            <!-- Não precisa de mudar o formulário de pergunta -->
             <form method="post" class="question-form" action="{% url 'cursos:ver_aula' pk=aula.pk %}">
                 {% csrf_token %}
                 {{ form_pergunta.as_p }}
@@ -108,7 +108,8 @@
                         <p class="question-content">{{ pergunta.conteudo|linebreaks }}</p>
 
                         <div class="replies-container">
-                            {% for resposta in pergunta.respostas.all|dictsortreversed:"total_votos" %}
+                            <!-- A CORREÇÃO ESTÁ AQUI: Usamos o nosso novo método -->
+                            {% for resposta in pergunta.get_respostas_ordenadas %}
                                 <div class="reply">
                                     <p>
                                         <span class="reply-author">{{ resposta.usuario.first_name }} {{ resposta.usuario.last_name }}</span>
@@ -126,7 +127,7 @@
                                 </div>
                             {% endfor %}
 
-                            <!-- Formulário de Resposta ATUALIZADO para a lógica unificada -->
+                            <!-- Não precisa de mudar o formulário de resposta -->
                             <form method="post" action="{% url 'cursos:ver_aula' pk=aula.pk %}" class="reply-form">
                                 {% csrf_token %}
                                 <input type="hidden" name="pergunta_id" value="{{ pergunta.pk }}">
@@ -141,6 +142,5 @@
             </div>
         </div>
     </main>
-
 </body>
 </html>

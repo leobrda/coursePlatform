@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.text import slugify
+from django.db.models import Count
+from django.db.models.functions import Coalesce
 
 
 class Associado(models.Model):
@@ -66,6 +68,11 @@ class Pergunta(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Usuário")
     conteudo = models.TextField(verbose_name="Conteúdo da Pergunta")
     data_criacao = models.DateTimeField(auto_now_add=True)
+
+    def get_respostas_ordenadas(self):
+        return self.respostas.annotate(
+            num_votos=Coalesce(Count('votos'), 0)
+        ).order_by('-num_votos', 'data_criacao')
 
     class Meta:
         ordering = ['data_criacao']

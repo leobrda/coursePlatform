@@ -71,6 +71,9 @@ def detalhe_curso(request, pk):
 def ver_aula(request, pk):
     aula = get_object_or_404(Aula, pk=pk)
 
+    form_pergunta = PerguntaForm()
+    form_resposta = RespostaForm()
+
     if request.method == 'POST':
         if 'submit_pergunta' in request.POST:
             form_pergunta = PerguntaForm(request.POST)
@@ -80,7 +83,8 @@ def ver_aula(request, pk):
                 nova_pergunta.usuario = request.user
                 nova_pergunta.save()
                 return redirect('cursos:ver_aula', pk=aula.pk)
-        elif 'submit_reposta' in request.POST:
+
+        elif 'submit_resposta' in request.POST:
             form_resposta = RespostaForm(request.POST)
             pergunta_id = request.POST.get('pergunta_id')
             if form_resposta.is_valid() and pergunta_id:
@@ -91,18 +95,14 @@ def ver_aula(request, pk):
                 nova_resposta.save()
                 return redirect('cursos:ver_aula', pk=aula.pk)
 
-    form_pergunta = PerguntaForm()
-    form_resposta = RespostaForm()
-    perguntas_da_aula = Pergunta.objects.filter(aula=aula).prefetch_related('respostas__usuario', 'respostas__votos')
-
-    embed_url = f"https://www.youtube.com/embed/{aula.youtube_video_id}"
+    perguntas_da_aula = Pergunta.objects.filter(aula=aula)
 
     context = {
         'aula': aula,
-        'embed_url': embed_url,
         'perguntas': perguntas_da_aula,
         'form_pergunta': form_pergunta,
         'form_resposta': form_resposta,
+        'embed_url': f'https://www.youtube.com/embed/{aula.youtube_video_id}',
     }
 
     return render(request, 'cursos/ver_aula.html', context=context)
