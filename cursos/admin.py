@@ -2,7 +2,7 @@ from django import forms
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
-from .models import Associado, Curso, Aula, Pergunta, Resposta
+from .models import Associado, Curso, Aula, Pergunta, Resposta, Categoria
 from urllib.parse import urlparse, parse_qs
 
 
@@ -78,6 +78,7 @@ class AulaInline(admin.TabularInline):
 class CursoAdmin(admin.ModelAdmin):
     list_display = ('titulo', 'instrutor', 'data_criacao')
     search_fields = ('titulo', 'descricao')
+    filter_horizontal = ('categorias',)
     inlines = [AulaInline]
 
 
@@ -100,3 +101,9 @@ class RespostaAdmin(admin.ModelAdmin):
     list_display = ('id', 'pergunta', 'usuario', 'data_criacao')
     list_filter = ('pergunta__aula',)
     search_fields = ('conteudo',)
+
+
+@admin.register(Categoria)
+class CategoriaAdmin(admin.ModelAdmin):
+    list_display = ('nome', 'slug')
+    readonly_fields = ('slug',)
