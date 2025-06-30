@@ -54,17 +54,17 @@
 
         <div class="lesson-list">
             <h2>Aulas do Curso</h2>
-            <!-- Loop para listar todas as aulas associadas a este curso -->
             {% for aula in curso.aulas.all %}
                 <div class="lesson-item">
-                    <span class="lesson-title">{{ aula.ordem }}. {{ aula.titulo }}</span>
-                    <div class="lesson-links">
-                        <!-- Link para o vídeo (abre em nova aba) -->
-                        <a href="{% url 'cursos:ver_aula' pk=aula.pk %}" class="watch-video" target="_blank">Assistir Vídeo</a>
-                        <!-- Link para o material de apoio, se existir -->
-                        {% if aula.material_apoio %}
-                            <a href="{{ aula.material_apoio.url }}" class="download-material" download>Baixar Material</a>
+                    <div class="lesson-title">
+                        <!-- INDICADOR DE CONCLUSÃO ADICIONADO AQUI -->
+                        {% if aula in user.associado.aulas_concluidas.all %}
+                            <span class="completed-icon">✔</span>
                         {% endif %}
+                        <span>{{ aula.ordem }}. {{ aula.titulo }}</span>
+                    </div>
+                    <div class="lesson-links">
+                        <a href="{% url 'cursos:ver_aula' pk=aula.pk %}" class="watch-video">Assistir Aula</a>
                     </div>
                 </div>
             {% empty %}

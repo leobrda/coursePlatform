@@ -6,6 +6,7 @@ class Associado(models.Model):
     usuario = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Usuário')
     biografia = models.TextField(blank=True, verbose_name='Biografia')
     aprovado = models.BooleanField(default=False, verbose_name='Cadastro Aprovado')
+    aulas_concluidas = models.ManyToManyField('Aula', related_name='concluida_por', blank=True)
 
     def __str__(self):
         return self.usuario.username
