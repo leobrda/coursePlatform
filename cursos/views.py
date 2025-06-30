@@ -4,7 +4,7 @@ from .forms import UserRegistrationForm, UserEditForm, PerguntaForm, RespostaFor
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.contrib.auth import logout
-from .models import Curso, Aula, Pergunta, Resposta
+from .models import Curso, Aula, Pergunta, Resposta, Associado
 
 
 def register(request):
@@ -135,3 +135,17 @@ def votar_resposta(request, pk_resposta):
         resposta.votos.add(request.user)
 
     return redirect('cursos:ver_aula', pk=resposta.pergunta.aula.pk)
+
+
+@login_required
+def marcar_aula_concluida(request, pk_aula):
+    aula = get_object_or_404(Aula, pk=pk_aula)
+
+    associado = get_object_or_404(Associado, usuario=request.user)
+
+    if aula in associado.aulas_concluidas.all():
+        associado.aulas_concluidas.remove(aula)
+    else:
+        associado.aulas_concluidas.add(aula)
+
+    return redirect('cursos:detalhe_curso', pk=aula.curso.pk)
