@@ -8,8 +8,20 @@
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0; background-color: #f8f9fa;}
         .header { background-color: #fff; padding: 1em 2em; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
         .header h1 { margin: 0; font-size: 1.5em; color: #343a40; }
-        .header .user-info a { color: #dc3545; text-decoration: none; font-weight: bold; }
-        .container { max-width: 1200px; margin: 2em auto; padding: 0 2em; }
+        .header .user-info a { color: #007bff; text-decoration: none; font-weight: bold; margin-left: 1em; }
+        .header .user-info a.logout { color: #dc3545; }
+        .container { max-width: 1400px; margin: 2em auto; padding: 0 2em; display: flex; gap: 2em; }
+
+        /* Nova barra lateral para categorias */
+        .sidebar { flex: 0 0 250px; background-color: #fff; padding: 1.5em; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); align-self: flex-start;}
+        .sidebar h3 { margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 0.5em; }
+        .sidebar ul { list-style: none; padding: 0; margin: 0; }
+        .sidebar ul li a { display: block; padding: 0.8em 0; text-decoration: none; color: #007bff; font-weight: 500; border-radius: 4px; transition: background-color 0.2s; }
+        .sidebar ul li a:hover { background-color: #e9ecef; }
+        .sidebar ul li a.active { background-color: #007bff; color: white; padding-left: 1em; }
+
+        /* Conteúdo principal dos cursos */
+        .main-content { flex-grow: 1; }
         .course-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2em; }
         .course-card { background-color: #fff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); overflow: hidden; transition: transform 0.2s; text-decoration: none; color: inherit;}
         .course-card:hover { transform: translateY(-5px); }
@@ -27,35 +39,61 @@
             {% if user.is_authenticated %}
                 <span>Olá, {{ user.first_name }}!</span>
                 <a href="{% url 'cursos:editar_perfil' %}">Minha Conta</a>
-                <a href="{% url 'cursos:logout' %}">Sair</a>
+                <a href="{% url 'cursos:logout' %}" class="logout">Sair</a>
             {% endif %}
         </div>
     </header>
 
-    <main class="container">
-        <h2>Cursos Disponíveis</h2>
-        <div class="course-grid">
-            <!-- Aqui começa o loop para mostrar cada curso -->
-            {% for curso in cursos %}
-                <a href="{% url 'cursos:detalhe_curso' pk=curso.pk %}" class="course-card">
-                    <!-- Mostra a imagem de capa do curso -->
-                    {% if curso.imagem_capa %}
-                        <img src="{{ curso.imagem_capa.url }}" alt="Capa do curso {{ curso.titulo }}">
-                    {% else %}
-                        <!-- Uma imagem padrão caso o curso não tenha capa -->
-                        <img src="https://placehold.co/600x400/007BFF/FFFFFF?text=Curso" alt="Capa padrão">
-                    {% endif %}
-                    <div class="course-card-content">
-                        <h3>{{ curso.titulo }}</h3>
-                        <p>{{ curso.descricao|truncatewords:20 }}</p> <!-- Limita a descrição a 20 palavras -->
-                    </div>
-                </a>
-            {% empty %}
-                <!-- Mensagem que aparece se não houver nenhum curso cadastrado -->
-                <p>Nenhum curso disponível no momento.</p>
-            {% endfor %}
-        </div>
-    </main>
+    <div class="container">
+        <aside class="sidebar">
+            <h3>Categorias</h3>
+            <ul>
+                <!-- Link para mostrar TODOS os cursos -->
+                <li>
+                    <a href="{% url 'home' %}" class="{% if not categoria_selecionada %}active{% endif %}">
+                        Todos os Cursos
+                    </a>
+                </li>
+                <!-- Loop para listar cada categoria como um link -->
+                {% for c in categorias %}
+                <li>
+                    <a href="{% url 'lista_cursos_por_categoria' c.slug %}" class="{% if categoria_selecionada.slug == c.slug %}active{% endif %}">
+                        {{ c.nome }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <!-- O título agora é dinâmico -->
+            <h2>
+                {% if categoria_selecionada %}
+                    Cursos em {{ categoria_selecionada.nome }}
+                {% else %}
+                    Cursos Disponíveis
+                {% endif %}
+            </h2>
+
+            <div class="course-grid">
+                {% for curso in cursos %}
+                    <a href="{% url 'cursos:detalhe_curso' pk=curso.pk %}" class="course-card">
+                        {% if curso.imagem_capa %}
+                            <img src="{{ curso.imagem_capa.url }}" alt="Capa do curso {{ curso.titulo }}">
+                        {% else %}
+                            <img src="https://placehold.co/600x400/007BFF/FFFFFF?text=Curso" alt="Capa padrão">
+                        {% endif %}
+                        <div class="course-card-content">
+                            <h3>{{ curso.titulo }}</h3>
+                            <p>{{ curso.descricao|truncatewords:20 }}</p>
+                        </div>
+                    </a>
+                {% empty %}
+                    <p>Nenhum curso encontrado nesta categoria.</p>
+                {% endfor %}
+            </div>
+        </main>
+    </div>
 
 </body>
 </html>

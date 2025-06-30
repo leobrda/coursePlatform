@@ -4,7 +4,7 @@ from .forms import UserRegistrationForm, UserEditForm, PerguntaForm, RespostaFor
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.contrib.auth import logout
-from .models import Curso, Aula, Pergunta, Resposta, Associado
+from .models import Curso, Aula, Pergunta, Resposta, Associado, Categoria
 
 
 def register(request):
@@ -38,11 +38,19 @@ class CustomLoginView(LoginView):
 
 
 @login_required
-def listar_cursos(request):
+def listar_cursos(request, category_slug=None):
+    categoria_selecionada = None
     cursos = Curso.objects.all()
+    categorias = Categoria.objects.all()
+
+    if category_slug:
+        categoria_selecionada = get_object_or_404(Categoria, slug=category_slug)
+        cursos = cursos.filter(categorias=categoria_selecionada)
 
     context = {
         'cursos': cursos,
+        'categorias': categorias,
+        'categoria_selecionada': categoria_selecionada,
     }
 
     return render(request, 'cursos/lista_cursos.html', context=context)

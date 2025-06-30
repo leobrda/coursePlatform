@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.text import slugify
 
 
 class Associado(models.Model):
@@ -12,11 +13,28 @@ class Associado(models.Model):
         return self.usuario.username
 
 
+class Categoria(models.Model):
+    nome = models.CharField(max_length=100, unique=True, verbose_name="Nome")
+    slug = models.SlugField(max_length=100, unique=True, blank=True, help_text="Este campo é preenchido automaticamente.")
+
+    class Meta:
+        verbose_name_plural = "Categorias"
+        ordering = ['nome']
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.nome)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.nome
+
 class Curso(models.Model):
     titulo = models.CharField(max_length=350, verbose_name='Título do Curso')
     descricao = models.TextField(verbose_name='Descrição do Curso', blank=True)
     imagem_capa = models.ImageField(upload_to='cursos/capas/', blank=True, null=True, verbose_name='Imagem de Capa')
     instrutor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, verbose_name='Instrutor')
+    categorias = models.ManyToManyField(Categoria, related_name='cursos', blank=True)
     data_criacao = models.DateTimeField(auto_now_add=True)
     data_atualizacao = models.DateTimeField(auto_now=True)
 

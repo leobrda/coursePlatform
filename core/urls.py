@@ -9,6 +9,8 @@ urlpatterns = [
     path('cursos/', include('cursos.urls', namespace='cursos')),
 
     path('', cursos_views.listar_cursos, name='home'),
+
+    path('categoria/<slug:category_slug>/', cursos_views.listar_cursos, name='lista_cursos_por_categoria'),
 ]
 
 if settings.DEBUG:
