@@ -96,3 +96,17 @@ class Resposta(models.Model):
 
     def total_votos(self):
         return self.votos.count()
+
+
+class Notificacao(models.Model):
+    destinatario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notificacoes')
+    resposta = models.ForeignKey(Resposta, on_delete=models.CASCADE)
+    lida = models.BooleanField(default=False)
+    data_criacao = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-data_criacao']
+        verbose_name_plural = 'Notificações'
+
+    def __str__(self):
+        return f'Notificação para {self.destinatario.username} sobre a resposta {self.resposta.id}'
