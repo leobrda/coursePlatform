@@ -4,7 +4,7 @@ from .forms import UserRegistrationForm, UserEditForm, PerguntaForm, RespostaFor
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.contrib.auth import logout
-from .models import Curso, Aula, Pergunta, Resposta, Associado, Categoria
+from .models import Curso, Aula, Pergunta, Resposta, Associado, Categoria, Notificacao
 
 
 def register(request):
@@ -152,3 +152,15 @@ def marcar_aula_concluida(request, pk_aula):
         associado.aulas_concluidas.add(aula)
 
     return redirect('cursos:detalhe_curso', pk=aula.curso.pk)
+
+
+@login_required
+def lista_notificacoes(request):
+    notificacoes = Notificacao.objects.filter(destinatario=request.user)
+    notificacoes.update(lida=True)
+
+    context = {
+        'notificacoes': notificacoes,
+    }
+
+    return render(request, 'cursos/notificacoes.html', context=context)

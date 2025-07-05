@@ -8,19 +8,16 @@
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0; background-color: #f8f9fa;}
         .header { background-color: #fff; padding: 1em 2em; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
         .header h1 { margin: 0; font-size: 1.5em; color: #343a40; }
-        .header .user-info a { color: #007bff; text-decoration: none; font-weight: bold; margin-left: 1em; }
+        .header .user-info { display: flex; align-items: center; gap: 1.5em; }
+        .header .user-info a { color: #007bff; text-decoration: none; font-weight: bold; }
         .header .user-info a.logout { color: #dc3545; }
         .container { max-width: 1400px; margin: 2em auto; padding: 0 2em; display: flex; gap: 2em; }
-
-        /* Nova barra lateral para categorias */
         .sidebar { flex: 0 0 250px; background-color: #fff; padding: 1.5em; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); align-self: flex-start;}
         .sidebar h3 { margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 0.5em; }
         .sidebar ul { list-style: none; padding: 0; margin: 0; }
         .sidebar ul li a { display: block; padding: 0.8em 0; text-decoration: none; color: #007bff; font-weight: 500; border-radius: 4px; transition: background-color 0.2s; }
         .sidebar ul li a:hover { background-color: #e9ecef; }
         .sidebar ul li a.active { background-color: #007bff; color: white; padding-left: 1em; }
-
-        /* Conteúdo principal dos cursos */
         .main-content { flex-grow: 1; }
         .course-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2em; }
         .course-card { background-color: #fff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); overflow: hidden; transition: transform 0.2s; text-decoration: none; color: inherit;}
@@ -29,6 +26,21 @@
         .course-card-content { padding: 1.5em; }
         .course-card h3 { margin-top: 0; color: #007bff; }
         .course-card p { color: #6c757d; font-size: 0.9em; line-height: 1.5; }
+
+        /* Estilos para o sino de notificação */
+        .notification-bell { position: relative; }
+        .notification-bell .bell-icon { font-size: 1.5em; color: #6c757d; }
+        .notification-bell .badge {
+            position: absolute;
+            top: -5px;
+            right: -10px;
+            padding: 2px 6px;
+            border-radius: 50%;
+            background-color: #dc3545;
+            color: white;
+            font-size: 0.75em;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -37,6 +49,12 @@
         <h1>Plataforma de Cursos</h1>
         <div class="user-info">
             {% if user.is_authenticated %}
+                <a href="{% url 'cursos:notificacoes' %}" class="notification-bell">
+                    <span class="bell-icon">🔔</span>
+                    {% if unread_notification_count > 0 %}
+                        <span class="badge">{{ unread_notification_count }}</span>
+                    {% endif %}
+                </a>
                 <span>Olá, {{ user.first_name }}!</span>
                 <a href="{% url 'cursos:editar_perfil' %}">Minha Conta</a>
                 <a href="{% url 'cursos:logout' %}" class="logout">Sair</a>
@@ -48,13 +66,11 @@
         <aside class="sidebar">
             <h3>Categorias</h3>
             <ul>
-                <!-- Link para mostrar TODOS os cursos -->
                 <li>
                     <a href="{% url 'home' %}" class="{% if not categoria_selecionada %}active{% endif %}">
                         Todos os Cursos
                     </a>
                 </li>
-                <!-- Loop para listar cada categoria como um link -->
                 {% for c in categorias %}
                 <li>
                     <a href="{% url 'lista_cursos_por_categoria' c.slug %}" class="{% if categoria_selecionada.slug == c.slug %}active{% endif %}">
@@ -66,7 +82,6 @@
         </aside>
 
         <main class="main-content">
-            <!-- O título agora é dinâmico -->
             <h2>
                 {% if categoria_selecionada %}
                     Cursos em {{ categoria_selecionada.nome }}

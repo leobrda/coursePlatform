@@ -8,7 +8,9 @@
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0; background-color: #f8f9fa;}
         .header { background-color: #fff; padding: 1em 2em; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
         .header .logo a { text-decoration: none; color: #343a40; font-size: 1.5em; font-weight: bold;}
-        .header .user-info a { color: #dc3545; text-decoration: none; font-weight: bold; }
+        .header .user-info { display: flex; align-items: center; gap: 1.5em; }
+        .header .user-info a { color: #007bff; text-decoration: none; font-weight: bold; }
+        .header .user-info a.logout { color: #dc3545; }
         .container { max-width: 900px; margin: 2em auto; padding: 0 2em; }
         .course-header { display: flex; gap: 2em; margin-bottom: 2em; background-color: #fff; padding: 2em; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.05);}
         .course-header img { width: 300px; height: 180px; object-fit: cover; border-radius: 8px; }
@@ -18,10 +20,25 @@
         .lesson-list h2 { margin-top: 0; }
         .lesson-item { border-bottom: 1px solid #eee; padding: 1.5em 0; display: flex; justify-content: space-between; align-items: center;}
         .lesson-item:last-child { border-bottom: none; }
-        .lesson-title { font-size: 1.2em; color: #343a40; }
+        .lesson-title { font-size: 1.2em; color: #343a40; display: flex; align-items: center; gap: 0.5em;}
         .lesson-links a { display: inline-block; padding: 0.5em 1em; text-decoration: none; border-radius: 4px; margin-left: 1em; font-weight: bold;}
         .watch-video { background-color: #28a745; color: white; }
-        .download-material { background-color: #ffc107; color: #212529; }
+        .completed-icon { color: #28a745; font-weight: bold; }
+
+        /* Estilos para o sino de notificação */
+        .notification-bell { position: relative; }
+        .notification-bell .bell-icon { font-size: 1.5em; color: #6c757d; }
+        .notification-bell .badge {
+            position: absolute;
+            top: -5px;
+            right: -10px;
+            padding: 2px 6px;
+            border-radius: 50%;
+            background-color: #dc3545;
+            color: white;
+            font-size: 0.75em;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -32,9 +49,15 @@
         </div>
         <div class="user-info">
             {% if user.is_authenticated %}
+                <a href="{% url 'cursos:notificacoes' %}" class="notification-bell">
+                    <span class="bell-icon">🔔</span>
+                    {% if unread_notification_count > 0 %}
+                        <span class="badge">{{ unread_notification_count }}</span>
+                    {% endif %}
+                </a>
                 <span>Olá, {{ user.first_name }}!</span>
                 <a href="{% url 'cursos:editar_perfil' %}">Minha Conta</a>
-                <a href="{% url 'cursos:logout' %}">Sair</a>
+                <a href="{% url 'cursos:logout' %}" class="logout">Sair</a>
             {% endif %}
         </div>
     </header>
@@ -57,8 +80,7 @@
             {% for aula in curso.aulas.all %}
                 <div class="lesson-item">
                     <div class="lesson-title">
-                        <!-- INDICADOR DE CONCLUSÃO ADICIONADO AQUI -->
-                        {% if aula in user.associado.aulas_concluidas.all %}
+                        {% if user.is_authenticated and user.associado and aula in user.associado.aulas_concluidas.all %}
                             <span class="completed-icon">✔</span>
                         {% endif %}
                         <span>{{ aula.ordem }}. {{ aula.titulo }}</span>
