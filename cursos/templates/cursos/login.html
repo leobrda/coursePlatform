@@ -15,9 +15,9 @@
         .btn:hover { background-color: #218838; }
         .messages { list-style: none; padding: 0; margin: 0 0 1em 0; }
         .messages li.error { background-color: #f8d7da; color: #721c24; padding: 1em; border: 1px solid #f5c6cb; border-radius: 4px; }
-        .register-link { text-align: center; margin-top: 1.5em; }
-        .register-link a { color: #007bff; text-decoration: none; }
-        .register-link a:hover { text-decoration: underline; }
+        .links-container { text-align: center; margin-top: 1.5em; }
+        .links-container a { color: #007bff; text-decoration: none; display: block; margin-top: 0.5em;}
+        .links-container a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -42,8 +42,9 @@
             <button type="submit" class="btn">Entrar</button>
         </form>
 
-        <div class="register-link">
-            <p>Ainda não tem uma conta? <a href="{% url 'cursos:registrar' %}">Cadastre-se</a></p>
+        <div class="links-container">
+            <a href="{% url 'cursos:password_reset' %}">Esqueceu a sua palavra-passe?</a>
+            <a href="{% url 'cursos:registrar' %}">Ainda não tem uma conta? Cadastre-se</a>
         </div>
     </div>
 </body>
