@@ -4,16 +4,31 @@ from .forms import UserRegistrationForm, UserEditForm, PerguntaForm, RespostaFor
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.contrib.auth import logout
-from .models import Curso, Aula, Pergunta, Resposta, Associado, Categoria, Notificacao
+from .models import Curso, Aula, Pergunta, Resposta, Associado, Categoria, Notificacao, Organizacao
 
+
+def get_user_organization(request):
+    try:
+        return request.user.associado.organizacao
+    except (Associado.DoesNotExist, AttributeError):
+        return None
 
 def register(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
 
         if form.is_valid():
-            form.save()
-            return redirect('cursos:registrar_concluido')
+            try:
+                organizacao_padrao = Organizacao.objects.first()
+                if not organizacao_padrao:
+                    pass
+
+                novo_usuario = form.save()
+                Associado.objects.filter(usuario=novo_usuario).update(organizacao=organizacao_padrao)
+                return redirect('cursos:registrar_concluido')
+            except Exception as e:
+                pass
+
     else:
         form = UserRegistrationForm()
 
@@ -39,12 +54,16 @@ class CustomLoginView(LoginView):
 
 @login_required
 def listar_cursos(request, category_slug=None):
-    categoria_selecionada = None
-    cursos = Curso.objects.all()
-    categorias = Categoria.objects.all()
+    organizacao_usuario = get_user_organization(request)
+    if not organizacao_usuario:
+        return render(request, 'cursos/erro_permissao.html')
 
+    cursos = Curso.objects.filter(organizacao=organizacao_usuario)
+    categorias = Categoria.objects.filter(organizacao=organizacao_usuario)
+
+    categoria_selecionada = None
     if category_slug:
-        categoria_selecionada = get_object_or_404(Categoria, slug=category_slug)
+        categoria_selecionada = get_object_or_404(Categoria, slug=category_slug, organizacao=organizacao_usuario)
         cursos = cursos.filter(categorias=categoria_selecionada)
 
     context = {
@@ -58,7 +77,11 @@ def listar_cursos(request, category_slug=None):
 
 @login_required
 def detalhe_curso(request, pk):
-    curso = get_object_or_404(Curso, pk=pk)
+    organizacao_usuario = get_user_organization(request)
+    if not organizacao_usuario:
+        return render(request, 'cursos/erro_permissao.html')
+
+    curso = get_object_or_404(Curso, pk=pk, organizacao=organizacao_usuario)
 
     context = {
         'curso': curso,
@@ -69,7 +92,11 @@ def detalhe_curso(request, pk):
 
 @login_required
 def ver_aula(request, pk):
-    aula = get_object_or_404(Aula, pk=pk)
+    organizacao_usuario = get_user_organization(request)
+    if not organizacao_usuario:
+        return render(request, 'cursos/erro_permissao.html')
+
+    aula = get_object_or_404(Aula, pk=pk, curso__organizacao=organizacao_usuario)
 
     form_pergunta = PerguntaForm()
     form_resposta = RespostaForm()
