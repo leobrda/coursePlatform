@@ -38,11 +38,43 @@
         .activity-item:last-child { border-bottom: none; }
         .activity-item a { text-decoration: none; color: #007bff; }
         .activity-item .meta { font-size: 0.9em; color: #6c757d; }
+
+        /* Estilos para o sino de notificação */
+        .notification-bell { position: relative; }
+        .notification-bell .bell-icon { font-size: 1.5em; color: #6c757d; }
+        .notification-bell .badge {
+            position: absolute;
+            top: -5px;
+            right: -10px;
+            padding: 2px 6px;
+            border-radius: 50%;
+            background-color: #dc3545;
+            color: white;
+            font-size: 0.75em;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
-    <header class="header"><!-- ... (cabeçalho existente) ... --></header>
+    <header class="header">
+        <div class="logo">
+            <a href="{% url 'home' %}">Plataforma</a>
+        </div>
+        <div class="user-info">
+            {% if user.is_authenticated %}
+                <a href="{% url 'cursos:notificacoes' %}" class="notification-bell">
+                    <span class="bell-icon">🔔</span>
+                    {% if unread_notification_count > 0 %}
+                        <span class="badge">{{ unread_notification_count }}</span>
+                    {% endif %}
+                </a>
+                <span>Olá, {{ user.first_name }}!</span>
+                <a href="{% url 'cursos:meu_painel' %}">Minha Conta</a>
+                <a href="{% url 'cursos:logout' %}" class="logout">Sair</a>
+            {% endif %}
+        </div>
+    </header>
 
     <main class="container">
         <h1>Meu Painel</h1>
