@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Associado, Pergunta, Resposta
+from .models import Associado, Pergunta, Resposta, Organizacao
 
 
 class UserRegistrationForm(forms.ModelForm):
@@ -14,6 +14,10 @@ class UserRegistrationForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ('username', 'first_name', 'last_name', 'email')
+
+    def __init__(self, *args, **kwargs):
+        self.organizacao = kwargs.pop('organizacao', None)
+        super().__init__(*args, **kwargs)
 
     def clean_password2(self):
         cd = self.cleaned_data
@@ -29,6 +33,7 @@ class UserRegistrationForm(forms.ModelForm):
             user.save()
             Associado.objects.create(
                 usuario=user,
+                organizacao=self.organizacao,
                 biografia=self.cleaned_data.get('biografia', '')
             )
         return user

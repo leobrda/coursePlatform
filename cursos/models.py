@@ -5,8 +5,17 @@ from django.db.models import Count
 from django.db.models.functions import Coalesce
 
 
+class Organizacao(models.Model):
+    nome = models.CharField(max_length=200, unique=True, verbose_name='Nome da Organização')
+    dono = models.OneToOneField(User, on_delete=models.CASCADE, related_name='organização_dono')
+
+    def __str__(self):
+        return self.nome
+
+
 class Associado(models.Model):
     usuario = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Usuário')
+    organizacao = models.ForeignKey(Organizacao, on_delete=models.CASCADE, related_name='associados')
     biografia = models.TextField(blank=True, verbose_name='Biografia')
     aprovado = models.BooleanField(default=False, verbose_name='Cadastro Aprovado')
     aulas_concluidas = models.ManyToManyField('Aula', related_name='concluida_por', blank=True)
@@ -16,11 +25,13 @@ class Associado(models.Model):
 
 
 class Categoria(models.Model):
+    organizacao = models.ForeignKey(Organizacao, on_delete=models.CASCADE, related_name='categorias')
     nome = models.CharField(max_length=100, unique=True, verbose_name="Nome")
     slug = models.SlugField(max_length=100, unique=True, blank=True, help_text="Este campo é preenchido automaticamente.")
 
     class Meta:
-        verbose_name_plural = "Categorias"
+        unique_together = ('organizacao', 'nome')
+        verbose_name_plural = 'Categorias'
         ordering = ['nome']
 
     def save(self, *args, **kwargs):
@@ -29,9 +40,10 @@ class Categoria(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.nome
+        return f'{self.nome} ({self.organizacao.nome})'
 
 class Curso(models.Model):
+    organizacao = models.ForeignKey(Organizacao, on_delete=models.CASCADE, related_name='cursos')
     titulo = models.CharField(max_length=350, verbose_name='Título do Curso')
     descricao = models.TextField(verbose_name='Descrição do Curso', blank=True)
     imagem_capa = models.ImageField(upload_to='cursos/capas/', blank=True, null=True, verbose_name='Imagem de Capa')
