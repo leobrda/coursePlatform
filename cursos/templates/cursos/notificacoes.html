@@ -29,7 +29,7 @@
             {% if user.is_authenticated %}
                 <!-- Futuramente, o sininho de notificação virá aqui -->
                 <span>Olá, {{ user.first_name }}!</span>
-                <a href="{% url 'cursos:editar_perfil' %}">Minha Conta</a>
+                <a href="{% url 'cursos:meu_painel' %}">Minha Conta</a>
                 <a href="{% url 'cursos:logout' %}" class="logout">Sair</a>
             {% endif %}
         </div>

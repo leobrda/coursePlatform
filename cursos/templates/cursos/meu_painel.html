@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Painel - Plataforma de Cursos</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0; background-color: #f8f9fa;}
+        .header { background-color: #fff; padding: 1em 2em; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .header .logo a { text-decoration: none; color: #343a40; font-size: 1.5em; font-weight: bold;}
+        .header .user-info { display: flex; align-items: center; gap: 1.5em; }
+        .header .user-info a { color: #007bff; text-decoration: none; font-weight: bold; }
+        .header .user-info a.logout { color: #dc3545; }
+        .container { max-width: 900px; margin: 2em auto; padding: 0 2em; }
+        .dashboard { background: #fff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); overflow: hidden;}
+
+        /* Estilos para as Abas */
+        .tab-nav { display: flex; border-bottom: 1px solid #dee2e6; }
+        .tab-button { padding: 1em 1.5em; cursor: pointer; border: none; background: none; font-size: 1em; font-weight: 500; color: #495057; }
+        .tab-button.active { color: #007bff; border-bottom: 3px solid #007bff; }
+
+        /* Estilos para o Conteúdo das Abas */
+        .tab-content { padding: 2em; }
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
+
+        /* Estilos para o formulário */
+        form p { display: flex; flex-direction: column; margin-bottom: 1.2em; }
+        form label { margin-bottom: 0.5em; font-weight: bold; }
+        form input, form textarea { padding: 0.8em; border: 1px solid #ddd; border-radius: 4px; font-size: 1em; }
+        .btn { background-color: #007bff; color: white; padding: 1em; border: none; border-radius: 4px; cursor: pointer; font-size: 1em; width: 100%;}
+        .messages { list-style: none; padding: 0; margin: 0 0 1.5em 0; }
+        .messages li.success { background-color: #d4edda; color: #155724; padding: 1em; border: 1px solid #c3e6cb; border-radius: 4px; text-align: center; }
+
+        /* Estilos para as listas de atividades */
+        .activity-list { list-style: none; padding: 0; }
+        .activity-item { padding: 1em; border-bottom: 1px solid #eee; }
+        .activity-item:last-child { border-bottom: none; }
+        .activity-item a { text-decoration: none; color: #007bff; }
+        .activity-item .meta { font-size: 0.9em; color: #6c757d; }
+
+        /* Estilos para o sino de notificação */
+        .notification-bell { position: relative; }
+        .notification-bell .bell-icon { font-size: 1.5em; color: #6c757d; }
+        .notification-bell .badge {
+            position: absolute;
+            top: -5px;
+            right: -10px;
+            padding: 2px 6px;
+            border-radius: 50%;
+            background-color: #dc3545;
+            color: white;
+            font-size: 0.75em;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="logo">
+            <a href="{% url 'home' %}">Plataforma</a>
+        </div>
+        <div class="user-info">
+            {% if user.is_authenticated %}
+                <a href="{% url 'cursos:notificacoes' %}" class="notification-bell">
+                    <span class="bell-icon">🔔</span>
+                    {% if unread_notification_count > 0 %}
+                        <span class="badge">{{ unread_notification_count }}</span>
+                    {% endif %}
+                </a>
+                <span>Olá, {{ user.first_name }}!</span>
+                <a href="{% url 'cursos:meu_painel' %}">Minha Conta</a>
+                <a href="{% url 'cursos:logout' %}" class="logout">Sair</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <main class="container">
+        <h1>Meu Painel</h1>
+        <div class="dashboard">
+            <nav class="tab-nav">
+                <button class="tab-button active" onclick="openTab(event, 'perfil')">Meu Perfil</button>
+                <button class="tab-button" onclick="openTab(event, 'cursos')">Meus Cursos</button>
+                <button class="tab-button" onclick="openTab(event, 'perguntas')">Minhas Perguntas</button>
+                <button class="tab-button" onclick="openTab(event, 'respostas')">Minhas Respostas</button>
+            </nav>
+
+            <!-- Aba 1: Editar Perfil -->
+            <div id="perfil" class="tab-content tab-pane active">
+                <h2>Editar Perfil</h2>
+                {% if messages %}
+                    <ul class="messages">
+                    {% for message in messages %}
+                        <li class="{{ message.tags }}">{{ message }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn">Salvar Alterações</button>
+                </form>
+            </div>
+
+            <!-- Aba 2: Meus Cursos -->
+            <div id="cursos" class="tab-content tab-pane">
+                <h2>Cursos em Progresso</h2>
+                <ul class="activity-list">
+                    {% for curso in meus_cursos %}
+                        <li class="activity-item">
+                            <a href="{% url 'cursos:detalhe_curso' pk=curso.pk %}">{{ curso.titulo }}</a>
+                        </li>
+                    {% empty %}
+                        <li>Você ainda não está inscrito em nenhum curso.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Aba 3: Minhas Perguntas -->
+            <div id="perguntas" class="tab-content tab-pane">
+                <h2>Minhas Perguntas</h2>
+                <ul class="activity-list">
+                    {% for pergunta in minhas_perguntas %}
+                        <li class="activity-item">
+                            <a href="{% url 'cursos:ver_aula' pk=pergunta.aula.pk %}">
+                                "{{ pergunta.conteudo|truncatewords:15 }}"
+                            </a>
+                            <div class="meta">Na aula: {{ pergunta.aula.titulo }}</div>
+                        </li>
+                    {% empty %}
+                        <li>Você ainda não fez nenhuma pergunta.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Aba 4: Minhas Respostas -->
+            <div id="respostas" class="tab-content tab-pane">
+                <h2>Minhas Respostas</h2>
+                <ul class="activity-list">
+                    {% for resposta in minhas_respostas %}
+                        <li class="activity-item">
+                            <a href="{% url 'cursos:ver_aula' pk=resposta.pergunta.aula.pk %}">
+                                "{{ resposta.conteudo|truncatewords:15 }}"
+                            </a>
+                            <div class="meta">Respondendo na aula: {{ resposta.pergunta.aula.titulo }}</div>
+                        </li>
+                    {% empty %}
+                        <li>Você ainda não deu nenhuma resposta.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function openTab(evt, tabName) {
+            // Esconde todo o conteúdo das abas
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-pane");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+
+            // Remove a classe "active" de todos os botões
+            tablinks = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+
+            // Mostra a aba atual e adiciona a classe "active" ao botão
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+    </script>
+
+</body>
+</html>
