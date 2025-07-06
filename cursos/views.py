@@ -14,23 +14,18 @@ def get_user_organization(request):
         return None
 
 def register(request):
+    organizacao_padrao = Organizacao.objects.first()
+    if not organizacao_padrao:
+        # Lidar com o caso de nenhuma organização existir (ex: mostrar uma página de erro)
+        return render(request, 'cursos/erro_setup.html')
+
     if request.method == 'POST':
-        form = UserRegistrationForm(request.POST)
-
+        form = UserRegistrationForm(request.POST, organizacao=organizacao_padrao)
         if form.is_valid():
-            try:
-                organizacao_padrao = Organizacao.objects.first()
-                if not organizacao_padrao:
-                    pass
-
-                novo_usuario = form.save()
-                Associado.objects.filter(usuario=novo_usuario).update(organizacao=organizacao_padrao)
-                return redirect('cursos:registrar_concluido')
-            except Exception as e:
-                pass
-
+            form.save()
+            return redirect('cursos:registrar_concluido')
     else:
-        form = UserRegistrationForm()
+        form = UserRegistrationForm(organizacao=organizacao_padrao)
 
     return render(request, 'cursos/registrar.html', {'form': form})
 
@@ -137,6 +132,10 @@ def ver_aula(request, pk):
 
 @login_required
 def meu_painel(request):
+    organizacao_usuario = get_user_organization(request)
+    if not organizacao_usuario:
+        return render(request, 'cursos/erro_permissao.html')
+
     if request.method == 'POST':
         form = UserEditForm(instance=request.user, data=request.POST, files=request.FILES)
         if form.is_valid():
@@ -148,7 +147,7 @@ def meu_painel(request):
 
     minhas_perguntas = Pergunta.objects.filter(usuario=request.user)
     minhas_respostas = Resposta.objects.filter(usuario=request.user)
-    meus_cursos = Curso.objects.all()
+    meus_cursos = Curso.objects.filter(organizacao=organizacao_usuario)
 
     context = {
         'form': form,
@@ -168,7 +167,11 @@ def logout_view(request):
 
 @login_required
 def votar_resposta(request, pk_resposta):
-    resposta = get_object_or_404(Resposta, pk=pk_resposta)
+    organizacao_usuario = get_user_organization(request)
+    if not organizacao_usuario:
+        return render(request, 'cursos/erro_permissao.html')
+
+    resposta = get_object_or_404(Resposta, pk=pk_resposta, pergunta__aula__curso__organizacao=organizacao_usuario)
 
     if resposta.votos.filter(id=request.user.id).exists():
         resposta.votos.remove(request.user)
@@ -180,9 +183,12 @@ def votar_resposta(request, pk_resposta):
 
 @login_required
 def marcar_aula_concluida(request, pk_aula):
-    aula = get_object_or_404(Aula, pk=pk_aula)
+    organizacao_usuario = get_user_organization(request)
+    if not organizacao_usuario:
+        return render(request, 'cursos/erro_permissao.html')
 
-    associado = get_object_or_404(Associado, usuario=request.user)
+    aula = get_object_or_404(Aula, pk=pk_aula, curso__organizacao=organizacao_usuario)
+    associado = request.user.associado
 
     if aula in associado.aulas_concluidas.all():
         associado.aulas_concluidas.remove(aula)
