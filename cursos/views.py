@@ -109,17 +109,28 @@ def ver_aula(request, pk):
 
 
 @login_required
-def editar_perfil(request):
+def meu_painel(request):
     if request.method == 'POST':
-        form = UserEditForm(instance=request.user, data=request.POST)
+        form = UserEditForm(instance=request.user, data=request.POST, files=request.FILES)
         if form.is_valid():
             form.save()
             messages.success(request, 'Perfil atualizado com sucesso!')
-            return redirect('cursos:editar_perfil')
+            return redirect('cursos:meu_painel')
     else:
         form = UserEditForm(instance=request.user)
 
-    return render(request, 'cursos/editar_perfil.html', {'form': form})
+    minhas_perguntas = Pergunta.objects.filter(usuario=request.user)
+    minhas_respostas = Resposta.objects.filter(usuario=request.user)
+    meus_cursos = Curso.objects.all()
+
+    context = {
+        'form': form,
+        'minhas_perguntas': minhas_perguntas,
+        'minhas_respostas': minhas_respostas,
+        'meus_cursos': meus_cursos,
+    }
+
+    return render(request, 'cursos/meu_painel.html', context=context)
 
 
 def logout_view(request):
