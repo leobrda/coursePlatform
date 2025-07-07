@@ -4,7 +4,7 @@ from .forms import UserRegistrationForm, UserEditForm, PerguntaForm, RespostaFor
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.contrib.auth import logout
-from django.http import Http404
+from django.http import Http404, HttpResponseForbidden
 from .models import Curso, Aula, Pergunta, Resposta, Associado, Categoria, Notificacao, Organizacao
 
 
@@ -231,3 +231,17 @@ def painel_instrutor(request):
     }
 
     return render(request, 'cursos/painel_administrativo.html', context=context)
+
+
+@login_required
+def aprovar_associado(request, pk_associado):
+    try:
+        organizacao = request.user.organizacao_dono
+    except Organizacao.DoesNotExist:
+        return HttpResponseForbidden('Você não tem permissão para realizar esta ação.')
+
+    associado = get_object_or_404(Associado, pk=pk_associado, organizacao=organizacao)
+    associado.aprovado = True
+    associado.save()
+
+    return redirect('cursos:painel_instrutor')

@@ -74,7 +74,7 @@
                             </div>
                             <div>
                                 <!-- Futuramente, este botão irá acionar uma view para aprovar o utilizador -->
-                                <a href="#" class="btn-approve">Aprovar</a>
+                                <a href="{% url 'cursos:aprovar_associado' pk_associado=associado.pk %}" class="btn-approve">Aprovar</a>
                             </div>
                         </li>
                     {% endfor %}
