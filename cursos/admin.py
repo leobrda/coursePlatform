@@ -2,7 +2,7 @@ from django import forms
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
-from .models import Associado, Curso, Aula, Pergunta, Resposta, Categoria
+from .models import Associado, Curso, Aula, Pergunta, Resposta, Categoria, Organizacao
 from urllib.parse import urlparse, parse_qs
 
 
@@ -107,3 +107,9 @@ class RespostaAdmin(admin.ModelAdmin):
 class CategoriaAdmin(admin.ModelAdmin):
     list_display = ('nome', 'slug')
     readonly_fields = ('slug',)
+
+
+@admin.register(Organizacao)
+class OrganizacaoAdmin(admin.ModelAdmin):
+    list_display = ('nome', 'dono')
+
