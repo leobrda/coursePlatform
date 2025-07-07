@@ -22,14 +22,24 @@
 </head>
 <body>
     <header class="header">
-        <div class="logo">
-            <a href="{% url 'home' %}">Plataforma</a>
-        </div>
+        <!-- AQUI ESTÁ A CORREÇÃO -->
+        <h1><a href="{% url 'home' %}">Plataforma de Cursos</a></h1>
         <div class="user-info">
             {% if user.is_authenticated %}
-                <!-- Futuramente, o sininho de notificação virá aqui -->
+                <a href="{% url 'cursos:notificacoes' %}" class="notification-bell">
+                    <span class="bell-icon">🔔</span>
+                    {% if unread_notification_count > 0 %}
+                        <span class="badge">{{ unread_notification_count }}</span>
+                    {% endif %}
+                </a>
                 <span>Olá, {{ user.first_name }}!</span>
-                <a href="{% url 'cursos:meu_painel' %}">Minha Conta</a>
+
+                {% if is_org_owner %}
+                    <a href="{% url 'cursos:painel_instrutor' %}">Painel do Instrutor</a>
+                {% else %}
+                    <a href="{% url 'cursos:meu_painel' %}">Minha Conta</a>
+                {% endif %}
+
                 <a href="{% url 'cursos:logout' %}" class="logout">Sair</a>
             {% endif %}
         </div>

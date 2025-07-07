@@ -214,7 +214,7 @@ def lista_notificacoes(request):
 @login_required
 def painel_instrutor(request):
     try:
-        organizacao = request.user.organizacao_dono
+        organizacao = Organizacao.objects.get(dono=request.user)
     except Organizacao.DoesNotExist:
         raise Http404
 
@@ -227,20 +227,21 @@ def painel_instrutor(request):
         'organizacao': organizacao,
         'total_associados': total_associados,
         'total_cursos': total_cursos,
-        'associados_pendentes': associados_pendentes
+        'associados_pendentes': associados_pendentes,
     }
 
-    return render(request, 'cursos/painel_administrativo.html', context=context)
+    return render(request, 'cursos/painel_instrutor.html', context=context)
 
 
 @login_required
 def aprovar_associado(request, pk_associado):
     try:
-        organizacao = request.user.organizacao_dono
+        organizacao = Organizacao.objects.get(dono=request.user)
     except Organizacao.DoesNotExist:
-        return HttpResponseForbidden('Você não tem permissão para realizar esta ação.')
+        return HttpResponseForbidden("Você não tem permissão para realizar esta ação.")
 
     associado = get_object_or_404(Associado, pk=pk_associado, organizacao=organizacao)
+
     associado.aprovado = True
     associado.save()
 
