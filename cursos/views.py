@@ -4,6 +4,7 @@ from .forms import UserRegistrationForm, UserEditForm, PerguntaForm, RespostaFor
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.contrib.auth import logout
+from django.http import Http404, HttpResponseForbidden
 from .models import Curso, Aula, Pergunta, Resposta, Associado, Categoria, Notificacao, Organizacao
 
 
@@ -208,3 +209,40 @@ def lista_notificacoes(request):
     }
 
     return render(request, 'cursos/notificacoes.html', context=context)
+
+
+@login_required
+def painel_instrutor(request):
+    try:
+        organizacao = Organizacao.objects.get(dono=request.user)
+    except Organizacao.DoesNotExist:
+        raise Http404
+
+    total_associados = Associado.objects.filter(organizacao=organizacao).count()
+    total_cursos = Curso.objects.filter(organizacao=organizacao).count()
+
+    associados_pendentes = Associado.objects.filter(organizacao=organizacao, aprovado=False)
+
+    context = {
+        'organizacao': organizacao,
+        'total_associados': total_associados,
+        'total_cursos': total_cursos,
+        'associados_pendentes': associados_pendentes,
+    }
+
+    return render(request, 'cursos/painel_instrutor.html', context=context)
+
+
+@login_required
+def aprovar_associado(request, pk_associado):
+    try:
+        organizacao = Organizacao.objects.get(dono=request.user)
+    except Organizacao.DoesNotExist:
+        return HttpResponseForbidden("Você não tem permissão para realizar esta ação.")
+
+    associado = get_object_or_404(Associado, pk=pk_associado, organizacao=organizacao)
+
+    associado.aprovado = True
+    associado.save()
+
+    return redirect('cursos:painel_instrutor')
