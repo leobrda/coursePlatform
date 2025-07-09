@@ -222,12 +222,14 @@ def painel_instrutor(request):
     total_cursos = Curso.objects.filter(organizacao=organizacao).count()
 
     associados_pendentes = Associado.objects.filter(organizacao=organizacao, aprovado=False)
+    cursos_da_organizacao = Curso.objects.filter(organizacao=organizacao)
 
     context = {
         'organizacao': organizacao,
         'total_associados': total_associados,
         'total_cursos': total_cursos,
         'associados_pendentes': associados_pendentes,
+        'cursos': cursos_da_organizacao,
     }
 
     return render(request, 'cursos/painel_instrutor.html', context=context)
@@ -251,7 +253,7 @@ def aprovar_associado(request, pk_associado):
 @login_required
 def criar_curso(request):
     try:
-        organizacao = request.user.organizacao_dono
+        organizacao = Organizacao.objects.get(dono=request.user)
     except Organizacao.DoesNotExist:
         return HttpResponseForbidden("Você não tem permissão para criar cursos.")
 

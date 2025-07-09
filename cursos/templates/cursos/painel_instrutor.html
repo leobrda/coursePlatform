@@ -95,6 +95,28 @@
                 <p>Não há nenhum cadastro pendente de aprovação no momento.</p>
             {% endif %}
         </div>
+
+        <div class="management-section">
+            <div class="section-header">
+                <h2>Meus Cursos</h2>
+                <a href="{% url 'cursos:criar_curso' %}" class="btn">Adicionar Novo Curso</a>
+            </div>
+            {% if cursos %}
+                <ul class="item-list">
+                    {% for curso in cursos %}
+                        <li class="item">
+                            <div class="item-details">
+                                <span class="name">{{ curso.titulo }}</span>
+                                <span class="meta">Criado em: {{ curso.data_criacao|date:"d/m/Y" }}</span>
+                            </div>
+                            <!-- Futuramente, podemos adicionar um botão de "Editar" aqui -->
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Você ainda não criou nenhum curso.</p>
+            {% endif %}
+        </div>
     </main>
 
 </body>
