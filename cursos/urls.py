@@ -12,6 +12,7 @@ from .views import (
     lista_notificacoes,
     painel_instrutor,
     aprovar_associado,
+    criar_curso,
 )
 
 app_name = 'cursos'
@@ -29,10 +30,11 @@ urlpatterns = [
     path('aula/<int:pk_aula>/concluir/', marcar_aula_concluida, name='marcar_aula_concluida'),
 
     path('minha-conta/', meu_painel, name='meu_painel'),
-
     path('notificacoes/', lista_notificacoes, name='notificacoes'),
+
     path('meu-painel-instrutor/', painel_instrutor, name='painel_instrutor'),
     path('associado/<int:pk_associado>/aprovar/', aprovar_associado, name='aprovar_associado'),
+    path('meu-painel-instrutor/cursos/novo/', criar_curso, name='criar_curso'),
 
     path('password_reset/', auth_views.PasswordResetView.as_view(template_name='cursos/password_reset_form.html', success_url=reverse_lazy('cursos:password_reset_done'), email_template_name='registration/password_reset_email.html'), name='password_reset'),
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='cursos/password_reset_done.html'), name='password_reset_done'),
