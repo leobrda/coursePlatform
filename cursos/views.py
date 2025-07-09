@@ -251,22 +251,48 @@ def aprovar_associado(request, pk_associado):
 
 
 @login_required
-def criar_curso(request):
+def gerir_curso_form(request, pk=None):
     try:
         organizacao = Organizacao.objects.get(dono=request.user)
     except Organizacao.DoesNotExist:
-        return HttpResponseForbidden("Você não tem permissão para criar cursos.")
+        return HttpResponseForbidden("Acesso negado.")
+
+    curso = None
+    if pk:
+        curso = get_object_or_404(Curso, pk=pk, organizacao=organizacao)
 
     if request.method == 'POST':
-        form = CursoForm(request.POST, request.FILES, organizacao=organizacao)
+        form = CursoForm(request.POST, request.FILES, instance=curso, organizacao=organizacao)
         if form.is_valid():
-            novo_curso = form.save(commit=False)
-            novo_curso.organizacao = organizacao
-            novo_curso.instrutor = request.user
-            novo_curso.save()
+            curso_salvo = form.save(commit=False)
+            if not curso_salvo.pk:
+                curso_salvo.organizacao = organizacao
+                curso_salvo.instrutor = request.user
+            curso_salvo.save()
             form.save_m2m()
             return redirect('cursos:painel_instrutor')
     else:
-        form = CursoForm(organizacao=organizacao)
+        form = CursoForm(instance=curso, organizacao=organizacao)
 
-    return render(request, 'cursos/curso_form.html', {'form': form})
+    context = {
+        'form': form,
+        'curso': curso,
+    }
+    return render(request, 'cursos/curso_form.html', context=context)
+
+
+@login_required
+def gerir_aulas(request, pk_curso):
+    try:
+        organizacao = Organizacao.objects.get(dono=request.user)
+    except Organizacao.DoesNotExist:
+        return HttpResponseForbidden("Acesso negado.")
+
+    curso = get_object_or_404(Curso, pk=pk_curso, organizacao=organizacao)
+    aulas = Aula.objects.filter(curso=curso).order_by('ordem')
+
+    contexto = {
+        'curso': curso,
+        'aulas': aulas,
+    }
+    return render(request, 'cursos/gerir_aulas.html', contexto)

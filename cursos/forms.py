@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from .models import Associado, Pergunta, Resposta, Organizacao, Curso, Categoria
 
 
+
 class UserRegistrationForm(forms.ModelForm):
     first_name = forms.CharField(label='Nome', max_length=150, required=True)
     last_name = forms.CharField(label='Sobrenome', max_length=150, required=True)
@@ -92,14 +93,11 @@ class CursoForm(forms.ModelForm):
         model = Curso
         fields = ['titulo', 'descricao', 'imagem_capa', 'categorias']
         widgets = {
-            'titulo': forms.TextInput(attrs={'placeholder': 'Ex: Introdução ao Direito Digital'}),
-            'descricao': forms.Textarea(attrs={'rows': 5}),
             'categorias': forms.CheckboxSelectMultiple,
         }
 
     def __init__(self, *args, **kwargs):
         organizacao = kwargs.pop('organizacao', None)
         super().__init__(*args, **kwargs)
-
         if organizacao:
             self.fields['categorias'].queryset = Categoria.objects.filter(organizacao=organizacao)
