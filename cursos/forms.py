@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Associado, Pergunta, Resposta, Organizacao, Curso, Categoria
+from .models import Associado, Pergunta, Resposta, Organizacao, Curso, Categoria, Aula
+from django.forms import inlineformset_factory
 
 
 class UserRegistrationForm(forms.ModelForm):
@@ -103,3 +104,23 @@ class CursoForm(forms.ModelForm):
 
         if organizacao:
             self.fields['categorias'].queryset = Categoria.objects.filter(organizacao=organizacao)
+
+
+class AulaForm(forms.ModelForm):
+    class Meta:
+        model = Aula
+        fields = ['titulo', 'descricao', 'youtube_video_id', 'material_apoio', 'ordem']
+        widgets = {
+            'titulo': forms.TextInput(attrs={'placeholder': 'Título da Aula'}),
+            'descricao': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Descrição da Aula'}),
+            'youtube_video_id': forms.TextInput(attrs={'placeholder': 'Apenas o ID do vídeo, ex: dQw4w9WgXcQ'}),
+        }
+
+AulaFormSet = inlineformset_factory(
+    Curso,
+    Aula,
+    form=AulaForm,
+    extra=1,
+    can_delete=True,
+    fk_name='curso'
+)

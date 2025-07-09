@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .forms import UserRegistrationForm, UserEditForm, PerguntaForm, RespostaForm, CursoForm
+from .forms import UserRegistrationForm, UserEditForm, PerguntaForm, RespostaForm, CursoForm, AulaFormSet
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.contrib.auth import logout
@@ -251,22 +251,41 @@ def aprovar_associado(request, pk_associado):
 
 
 @login_required
-def criar_curso(request):
+def gerir_curso(request, pk=None):
     try:
-        organizacao = Organizacao.objects.get(dono=request.user)
+        organizacao = request.user.organizacao_dono
     except Organizacao.DoesNotExist:
-        return HttpResponseForbidden("Você não tem permissão para criar cursos.")
+        return HttpResponseForbidden("Você não tem permissão para gerir cursos.")
+
+    curso = None
+    if pk:
+        curso = get_object_or_404(Curso, pk=pk, organizacao=organizacao)
 
     if request.method == 'POST':
-        form = CursoForm(request.POST, request.FILES, organizacao=organizacao)
-        if form.is_valid():
-            novo_curso = form.save(commit=False)
-            novo_curso.organizacao = organizacao
-            novo_curso.instrutor = request.user
-            novo_curso.save()
+        form = CursoForm(request.POST, request.FILES, instance=curso, organizacao=organizacao)
+        formset = AulaFormSet(request.POST, request.FILES, instance=curso)
+
+        if form.is_valid() and formset.is_valid():
+            curso_salvo = form.save(commit=False)
+            if not curso_salvo.organizacao_id:  # Se for um curso novo
+                curso_salvo.organizacao = organizacao
+                curso_salvo.instrutor = request.user
+            curso_salvo.save()
             form.save_m2m()
+
+            # Guardar as aulas associadas
+            formset.instance = curso_salvo
+            formset.save()
+
             return redirect('cursos:painel_instrutor')
     else:
-        form = CursoForm(organizacao=organizacao)
+        form = CursoForm(instance=curso, organizacao=organizacao)
+        formset = AulaFormSet(instance=curso)
 
-    return render(request, 'cursos/curso_form.html', {'form': form})
+    contexto = {
+        'form': form,
+        'formset': formset,
+        'curso': curso,
+    }
+
+    return render(request, 'cursos/curso_form.html', contexto)
