@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .forms import UserRegistrationForm, UserEditForm, PerguntaForm, RespostaForm
+from .forms import UserRegistrationForm, UserEditForm, PerguntaForm, RespostaForm, CursoForm
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.contrib.auth import logout
@@ -222,12 +222,14 @@ def painel_instrutor(request):
     total_cursos = Curso.objects.filter(organizacao=organizacao).count()
 
     associados_pendentes = Associado.objects.filter(organizacao=organizacao, aprovado=False)
+    cursos_da_organizacao = Curso.objects.filter(organizacao=organizacao)
 
     context = {
         'organizacao': organizacao,
         'total_associados': total_associados,
         'total_cursos': total_cursos,
         'associados_pendentes': associados_pendentes,
+        'cursos': cursos_da_organizacao,
     }
 
     return render(request, 'cursos/painel_instrutor.html', context=context)
@@ -246,3 +248,25 @@ def aprovar_associado(request, pk_associado):
     associado.save()
 
     return redirect('cursos:painel_instrutor')
+
+
+@login_required
+def criar_curso(request):
+    try:
+        organizacao = Organizacao.objects.get(dono=request.user)
+    except Organizacao.DoesNotExist:
+        return HttpResponseForbidden("Você não tem permissão para criar cursos.")
+
+    if request.method == 'POST':
+        form = CursoForm(request.POST, request.FILES, organizacao=organizacao)
+        if form.is_valid():
+            novo_curso = form.save(commit=False)
+            novo_curso.organizacao = organizacao
+            novo_curso.instrutor = request.user
+            novo_curso.save()
+            form.save_m2m()
+            return redirect('cursos:painel_instrutor')
+    else:
+        form = CursoForm(organizacao=organizacao)
+
+    return render(request, 'cursos/curso_form.html', {'form': form})
