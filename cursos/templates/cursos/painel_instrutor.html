@@ -57,7 +57,7 @@
     </header>
 
     <main class="container">
-        <h1>Painel de Controlo da Organização "{{ organizacao.nome }}"</h1>
+        <h1>Painel de Controle da Organização "{{ organizacao.nome }}"</h1>
 
         <div class="dashboard-grid">
             <div class="stat-card">
@@ -109,7 +109,12 @@
                                 <span class="name">{{ curso.titulo }}</span>
                                 <span class="meta">Criado em: {{ curso.data_criacao|date:"d/m/Y" }}</span>
                             </div>
-                            <!-- Futuramente, podemos adicionar um botão de "Editar" aqui -->
+                            <div class="item-actions">
+                                <!-- Botão para editar os DETALHES do curso -->
+                                <a href="{% url 'cursos:editar_curso' pk=curso.pk %}" class="btn btn-edit">Editar Detalhes</a>
+                                <!-- Botão para gerir as AULAS do curso -->
+                                <a href="{% url 'cursos:gerir_aulas' pk_curso=curso.pk %}" class="btn btn-manage-lessons">Gerir Aulas</a>
+                            </div>
                         </li>
                     {% endfor %}
                 </ul>

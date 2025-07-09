@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerir Aulas: {{ curso.titulo }}</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0; background-color: #f8f9fa;}
+        .header { background-color: #fff; padding: 1em 2em; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .header .logo a { text-decoration: none; color: #343a40; font-size: 1.5em; font-weight: bold;}
+        .header .user-info { display: flex; align-items: center; gap: 1.5em; }
+        .header .user-info a { color: #007bff; text-decoration: none; font-weight: bold; }
+        .header .user-info a.logout { color: #dc3545; }
+        .container { max-width: 1000px; margin: 2em auto; padding: 0 2em; }
+        .management-section { background-color: #fff; padding: 2em; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em; }
+        .section-header h1 { margin: 0; }
+        .btn { background-color: #007bff; color: white; padding: 0.6em 1.2em; text-decoration: none; border-radius: 4px; font-weight: bold; }
+        .btn-edit { background-color: #ffc107; color: #212529; }
+        .btn-danger { background-color: #dc3545; }
+        .item-list { list-style: none; padding: 0; }
+        .item { display: flex; justify-content: space-between; align-items: center; padding: 1em; border-bottom: 1px solid #eee; }
+        .item:nth-child(odd) { background-color: #f8f9fa; }
+        .item-details { font-weight: 500; }
+        .item-actions a { margin-left: 1em; }
+        .btn-back { display: inline-block; margin-top: 1.5em; color: #6c757d; text-decoration: none; font-weight: bold;}
+    </style>
+</head>
+<body>
+    <header class="header">
+        <!-- AQUI ESTÁ A CORREÇÃO -->
+        <h1><a href="{% url 'home' %}">Plataforma de Cursos</a></h1>
+        <div class="user-info">
+            {% if user.is_authenticated %}
+                <a href="{% url 'cursos:notificacoes' %}" class="notification-bell">
+                    <span class="bell-icon">🔔</span>
+                    {% if unread_notification_count > 0 %}
+                        <span class="badge">{{ unread_notification_count }}</span>
+                    {% endif %}
+                </a>
+                <span>Olá, {{ user.first_name }}!</span>
+
+                {% if is_org_owner %}
+                    <a href="{% url 'cursos:painel_instrutor' %}">Painel do Instrutor</a>
+                {% else %}
+                    <a href="{% url 'cursos:meu_painel' %}">Minha Conta</a>
+                {% endif %}
+
+                <a href="{% url 'cursos:logout' %}" class="logout">Sair</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="management-section">
+            <div class="section-header">
+                <h1>Gerir Aulas do Curso: "{{ curso.titulo }}"</h1>
+                <!-- Este botão ainda não funciona, vamos implementá-lo a seguir -->
+                <a href="#" class="btn">Adicionar Nova Aula</a>
+            </div>
+            {% if aulas %}
+                <ul class="item-list">
+                    {% for aula in aulas %}
+                        <li class="item">
+                            <span class="item-details">#{{ aula.ordem }} - {{ aula.titulo }}</span>
+                            <div class="item-actions">
+                                <!-- Estes botões também não funcionam ainda -->
+                                <a href="#" class="btn btn-edit">Editar</a>
+                                <a href="#" class="btn btn-danger">Apagar</a>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Ainda não há aulas para este curso. Comece por adicionar uma!</p>
+            {% endif %}
+        </div>
+        <a href="{% url 'cursos:painel_instrutor' %}" class="btn-back">&larr; Voltar para o Painel</a>
+    </main>
+</body>
+</html>

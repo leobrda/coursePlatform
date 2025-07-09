@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .forms import UserRegistrationForm, UserEditForm, PerguntaForm, RespostaForm, CursoForm, AulaFormSet
+from .forms import UserRegistrationForm, UserEditForm, PerguntaForm, RespostaForm, CursoForm
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.contrib.auth import logout
@@ -251,11 +251,11 @@ def aprovar_associado(request, pk_associado):
 
 
 @login_required
-def gerir_curso(request, pk=None):
+def gerir_curso_form(request, pk=None):
     try:
-        organizacao = request.user.organizacao_dono
+        organizacao = Organizacao.objects.get(dono=request.user)
     except Organizacao.DoesNotExist:
-        return HttpResponseForbidden("Você não tem permissão para gerir cursos.")
+        return HttpResponseForbidden("Acesso negado.")
 
     curso = None
     if pk:
@@ -263,29 +263,36 @@ def gerir_curso(request, pk=None):
 
     if request.method == 'POST':
         form = CursoForm(request.POST, request.FILES, instance=curso, organizacao=organizacao)
-        formset = AulaFormSet(request.POST, request.FILES, instance=curso)
-
-        if form.is_valid() and formset.is_valid():
+        if form.is_valid():
             curso_salvo = form.save(commit=False)
-            if not curso_salvo.organizacao_id:  # Se for um curso novo
+            if not curso_salvo.pk:
                 curso_salvo.organizacao = organizacao
                 curso_salvo.instrutor = request.user
             curso_salvo.save()
             form.save_m2m()
-
-            # Guardar as aulas associadas
-            formset.instance = curso_salvo
-            formset.save()
-
             return redirect('cursos:painel_instrutor')
     else:
         form = CursoForm(instance=curso, organizacao=organizacao)
-        formset = AulaFormSet(instance=curso)
 
-    contexto = {
+    context = {
         'form': form,
-        'formset': formset,
         'curso': curso,
     }
+    return render(request, 'cursos/curso_form.html', context=context)
 
-    return render(request, 'cursos/curso_form.html', contexto)
+
+@login_required
+def gerir_aulas(request, pk_curso):
+    try:
+        organizacao = Organizacao.objects.get(dono=request.user)
+    except Organizacao.DoesNotExist:
+        return HttpResponseForbidden("Acesso negado.")
+
+    curso = get_object_or_404(Curso, pk=pk_curso, organizacao=organizacao)
+    aulas = Aula.objects.filter(curso=curso).order_by('ordem')
+
+    contexto = {
+        'curso': curso,
+        'aulas': aulas,
+    }
+    return render(request, 'cursos/gerir_aulas.html', contexto)
