@@ -56,7 +56,7 @@
             <div class="section-header">
                 <h1>Editar Aulas do Curso: "{{ curso.titulo }}"</h1>
                 <!-- Este botão ainda não funciona, vamos implementá-lo a seguir -->
-                <a href="#" class="btn">Adicionar Nova Aula</a>
+                <a href="{% url 'cursos:adicionar_aula' pk_curso=curso.pk %}" class="btn">Adicionar Nova Aula</a>
             </div>
             {% if aulas %}
                 <ul class="item-list">
