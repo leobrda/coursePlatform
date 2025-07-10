@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Associado, Pergunta, Resposta, Organizacao, Curso, Categoria
+from .models import Associado, Pergunta, Resposta, Organizacao, Curso, Categoria, Aula
 
 
 
@@ -101,3 +101,12 @@ class CursoForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if organizacao:
             self.fields['categorias'].queryset = Categoria.objects.filter(organizacao=organizacao)
+
+
+class AulaForm(forms.ModelForm):
+    class Meta:
+        model = Aula
+        fields = ['titulo', 'descricao', 'youtube_video_id', 'material_apoio', 'ordem']
+        help_texts = {
+            'youtube_video_id': "Pode colar a URL completa do vídeo do YouTube aqui. O sistema extrairá o ID automaticamente."
+        }

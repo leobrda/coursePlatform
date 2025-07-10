@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .forms import UserRegistrationForm, UserEditForm, PerguntaForm, RespostaForm, CursoForm
+from .forms import UserRegistrationForm, UserEditForm, PerguntaForm, RespostaForm, CursoForm, AulaForm
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.contrib.auth import logout
@@ -296,3 +296,53 @@ def gerir_aulas(request, pk_curso):
         'aulas': aulas,
     }
     return render(request, 'cursos/gerir_aulas.html', contexto)
+
+
+@login_required
+def aula_form(request, pk_curso, pk_aula=None):
+    try:
+        organizacao = Organizacao.objects.get(dono=request.user)
+    except Organizacao.DoesNotExist:
+        return HttpResponseForbidden("Acesso negado.")
+
+    curso = get_object_or_404(Curso, pk=pk_curso, organizacao=organizacao)
+    aula = None
+    if pk_aula:
+        aula = get_object_or_404(Aula, pk=pk_aula, curso=curso)
+
+    if request.method == 'POST':
+        form = AulaForm(request.POST, request.FILES, instance=aula)
+        if form.is_valid():
+            aula_salva = form.save(commit=False)
+            aula_salva.curso = curso
+            aula_salva.save()
+            return redirect('cursos:gerir_aulas', pk_curso=curso.pk)
+    else:
+        form = AulaForm(instance=aula)
+
+    context = {
+        'form': form,
+        'curso': curso
+    }
+    return render(request, 'cursos/aula_form.html', context=context)
+
+
+@login_required
+def apagar_aula(request, pk_aula):
+    try:
+        organizacao = Organizacao.objects.get(dono=request.user)
+    except Organizacao.DoesNotExist:
+        return HttpResponseForbidden("Acesso negado.")
+
+    aula = get_object_or_404(Aula, pk=pk_aula, curso__organizacao=organizacao)
+    pk_curso = aula.curso.pk
+
+    if request.method == 'POST':
+        aula.delete()
+        return redirect('cursos:gerir_aulas', pk_curso=pk_curso)
+
+    context = {
+        'aula': aula,
+    }
+
+    return render(request, 'cursos/aula_confirm_delete.html', context=context)
