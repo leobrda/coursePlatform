@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from .models import Associado, Pergunta, Resposta, Organizacao, Curso, Categoria, Aula
-
+import re
 
 
 class UserRegistrationForm(forms.ModelForm):
@@ -104,9 +104,26 @@ class CursoForm(forms.ModelForm):
 
 
 class AulaForm(forms.ModelForm):
+    video_url = forms.CharField(
+        label='URL do vídeo no Youtube',
+        help_text='Cole a URL completa do vídeo do Youtube aqui. O sistema extrairá o ID automaticamente.',
+        required=True
+    )
     class Meta:
         model = Aula
-        fields = ['titulo', 'descricao', 'youtube_video_id', 'material_apoio', 'ordem']
-        help_texts = {
-            'youtube_video_id': "Pode colar a URL completa do vídeo do YouTube aqui. O sistema extrairá o ID automaticamente."
-        }
+        fields = ['titulo', 'descricao', 'video_url', 'material_apoio', 'ordem']
+
+    def clean_video_url(self):
+        url = self.cleaned_data.get('video_url')
+        if url:
+            regex = r'(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})'
+            match = re.search(regex, url)
+            if match:
+                return match.group(1)
+            else:
+                raise forms.ValidationError("URL do YouTube inválida ou formato não reconhecido.")
+        return url
+
+    def save(self, commit=True):
+        self.instance.youtube_video_id = self.cleaned_data.get('video_url')
+        return super().save(commit=commit)
