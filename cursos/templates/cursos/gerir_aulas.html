@@ -54,9 +54,9 @@
     <main class="container">
         <div class="management-section">
             <div class="section-header">
-                <h1>Gerir Aulas do Curso: "{{ curso.titulo }}"</h1>
+                <h1>Editar Aulas do Curso: "{{ curso.titulo }}"</h1>
                 <!-- Este botão ainda não funciona, vamos implementá-lo a seguir -->
-                <a href="#" class="btn">Adicionar Nova Aula</a>
+                <a href="{% url 'cursos:adicionar_aula' pk_curso=curso.pk %}" class="btn">Adicionar Nova Aula</a>
             </div>
             {% if aulas %}
                 <ul class="item-list">
@@ -65,8 +65,8 @@
                             <span class="item-details">#{{ aula.ordem }} - {{ aula.titulo }}</span>
                             <div class="item-actions">
                                 <!-- Estes botões também não funcionam ainda -->
-                                <a href="#" class="btn btn-edit">Editar</a>
-                                <a href="#" class="btn btn-danger">Apagar</a>
+                                <a href="{% url 'cursos:editar_aula' pk_curso=curso.pk pk_aula=aula.pk %}" class="btn btn-edit">Editar</a>
+                                <a href="{% url 'cursos:apagar_aula' pk_aula=aula.pk %}" class="btn btn-danger">Apagar</a>
                             </div>
                         </li>
                     {% endfor %}

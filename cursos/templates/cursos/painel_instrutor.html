@@ -113,7 +113,7 @@
                                 <!-- Botão para editar os DETALHES do curso -->
                                 <a href="{% url 'cursos:editar_curso' pk=curso.pk %}" class="btn btn-edit">Editar Detalhes</a>
                                 <!-- Botão para gerir as AULAS do curso -->
-                                <a href="{% url 'cursos:gerir_aulas' pk_curso=curso.pk %}" class="btn btn-manage-lessons">Gerir Aulas</a>
+                                <a href="{% url 'cursos:gerir_aulas' pk_curso=curso.pk %}" class="btn btn-manage-lessons">Editar Aulas</a>
                             </div>
                         </li>
                     {% endfor %}
