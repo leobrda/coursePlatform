@@ -41,7 +41,7 @@ urlpatterns = [
     path('meu-painel-instrutor/cursos/<int:pk>/editar/', gerir_curso_form, name='editar_curso'),
     path('meu-painel-instrutor/cursos/<int:pk_curso>/aulas/', gerir_aulas, name='gerir_aulas'),
     path('meu-painel-instrutor/cursos/<int:pk_curso>/aulas/nova/', aula_form, name='adicionar_aula'),
-    path('meu-painel-instrutor/aulas/<int:pk_aula>/editar/', aula_form, name='editar_aula'),
+    path('meu-painel-instrutor/cursos/<int:pk_curso>/aulas/<int:pk_aula>/editar/', aula_form, name='editar_aula'),
     path('meu-painel-instrutor/aulas/<int:pk_aula>/apagar/', apagar_aula, name='apagar_aula'),
 
     path('password_reset/', auth_views.PasswordResetView.as_view(template_name='cursos/password_reset_form.html', success_url=reverse_lazy('cursos:password_reset_done'), email_template_name='registration/password_reset_email.html'), name='password_reset'),

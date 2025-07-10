@@ -65,8 +65,8 @@
                             <span class="item-details">#{{ aula.ordem }} - {{ aula.titulo }}</span>
                             <div class="item-actions">
                                 <!-- Estes botões também não funcionam ainda -->
-                                <a href="#" class="btn btn-edit">Editar</a>
-                                <a href="#" class="btn btn-danger">Apagar</a>
+                                <a href="{% url 'cursos:editar_aula' pk_curso=curso.pk pk_aula=aula.pk %}" class="btn btn-edit">Editar</a>
+                                <a href="{% url 'cursos:apagar_aula' pk_aula=aula.pk %}" class="btn btn-danger">Apagar</a>
                             </div>
                         </li>
                     {% endfor %}
