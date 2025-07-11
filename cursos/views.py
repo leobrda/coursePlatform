@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .forms import UserRegistrationForm, UserEditForm, PerguntaForm, RespostaForm, CursoForm, AulaForm
+from .forms import UserRegistrationForm, UserEditForm, PerguntaForm, RespostaForm, CursoForm, AulaForm, CategoriaForm
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.contrib.auth import logout
@@ -346,3 +346,74 @@ def apagar_aula(request, pk_aula):
     }
 
     return render(request, 'cursos/aula_confirm_delete.html', context=context)
+
+
+@login_required
+def gerir_categorias(request):
+    try:
+        organizacao = Organizacao.objects.get(dono=request.user)
+    except Organizacao.DoesNotExist:
+        return HttpResponseForbidden("Acesso negado.")
+
+    categorias = Categoria.objects.filter(organizacao=organizacao)
+
+    if request.method == 'POST':
+        form = CategoriaForm(request.POST)
+        if form.is_valid():
+            nova_categoria = form.save(commit=False)
+            nova_categoria.organizacao = organizacao
+            nova_categoria.save()
+            return redirect('cursos:gerir_categorias')
+    else:
+        form = CategoriaForm()
+
+    context = {
+        'categorias': categorias,
+        'form': form
+    }
+    return render(request, 'cursos/gerir_categorias.html', context=context)
+
+
+@login_required
+def editar_categoria(request, pk_categoria):
+    try:
+        organizacao = Organizacao.objects.get(dono=request.user)
+    except:
+        return HttpResponseForbidden('Acesso negado.')
+
+    categoria = get_object_or_404(Categoria, pk=pk_categoria, organizacao=organizacao)
+
+    if request.method == 'POST':
+        form = CategoriaForm(request.POST, instance=categoria)
+        if form.is_valid():
+            form.save()
+            return redirect('cursos:gerir_categorias')
+    else:
+        form = CategoriaForm(instance=categoria)
+
+    context = {
+        'form': form,
+        'categoria': categoria,
+    }
+
+    return render(request, 'cursos/editar_categoria.html', context=context)
+
+
+@login_required
+def apagar_categoria(request, pk_categoria):
+    try:
+        organizacao = Organizacao.objects.get(dono=request.user)
+    except:
+        return HttpResponseForbidden('Acesso negado.')
+
+    categoria = get_object_or_404(Categoria, pk=pk_categoria, organizacao=organizacao)
+
+    if request.method == 'POST':
+        categoria.delete()
+        return redirect('cursos:gerir_categorias')
+
+    context = {
+        'categoria': categoria,
+    }
+
+    return render(request, 'cursos/apagar_categoria.html', context=context)

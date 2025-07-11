@@ -16,6 +16,9 @@ from .views import (
     gerir_aulas,
     aula_form,
     apagar_aula,
+    gerir_categorias,
+    editar_categoria,
+    apagar_categoria,
 )
 
 app_name = 'cursos'
@@ -43,6 +46,10 @@ urlpatterns = [
     path('meu-painel-instrutor/cursos/<int:pk_curso>/aulas/nova/', aula_form, name='adicionar_aula'),
     path('meu-painel-instrutor/cursos/<int:pk_curso>/aulas/<int:pk_aula>/editar/', aula_form, name='editar_aula'),
     path('meu-painel-instrutor/aulas/<int:pk_aula>/apagar/', apagar_aula, name='apagar_aula'),
+
+    path('meu-painel-instrutor/categorias/', gerir_categorias, name='gerir_categorias'),
+    path('meu-painel-instrutor/categorias/<int:pk_categoria>/editar/', editar_categoria, name='editar_categoria'),
+    path('meu-painel-instrutor/categorias/<int:pk_categoria>/apagar/', apagar_categoria, name='apagar_categoria'),
 
     path('password_reset/', auth_views.PasswordResetView.as_view(template_name='cursos/password_reset_form.html', success_url=reverse_lazy('cursos:password_reset_done'), email_template_name='registration/password_reset_email.html'), name='password_reset'),
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='cursos/password_reset_done.html'), name='password_reset_done'),

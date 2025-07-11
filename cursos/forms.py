@@ -127,3 +127,10 @@ class AulaForm(forms.ModelForm):
     def save(self, commit=True):
         self.instance.youtube_video_id = self.cleaned_data.get('video_url')
         return super().save(commit=commit)
+
+
+class CategoriaForm(forms.ModelForm):
+    class Meta:
+        model = Categoria
+        fields = ['nome']
+
