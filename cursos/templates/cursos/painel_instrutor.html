@@ -21,6 +21,8 @@
 
         .management-section { background-color: #fff; padding: 2em; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
         .management-section h2 { margin-top: 0; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em; }
+        .section-header h2 { margin: 0; }
         .user-list { list-style: none; padding: 0; }
         .user-item { display: flex; justify-content: space-between; align-items: center; padding: 1em 0; border-bottom: 1px solid #eee; }
         .user-item:last-child { border-bottom: none; }
@@ -121,6 +123,14 @@
             {% else %}
                 <p>Você ainda não criou nenhum curso.</p>
             {% endif %}
+        </div>
+
+        <div class="management-section">
+            <div class="section-header">
+                <h2>Minhas Categorias</h2>
+                <a href="{% url 'cursos:gerir_categorias' %}" class="btn btn-manage">Gerir Categorias</a>
+            </div>
+            <p>Adicione, edite ou apague as categorias usadas para organizar os seus cursos.</p>
         </div>
     </main>
 

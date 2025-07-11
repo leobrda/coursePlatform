@@ -377,7 +377,7 @@ def gerir_categorias(request):
 @login_required
 def editar_categoria(request, pk_categoria):
     try:
-        organizacao = Organizacao.objects.filter(dono=request.user)
+        organizacao = Organizacao.objects.get(dono=request.user)
     except:
         return HttpResponseForbidden('Acesso negado.')
 
@@ -402,7 +402,7 @@ def editar_categoria(request, pk_categoria):
 @login_required
 def apagar_categoria(request, pk_categoria):
     try:
-        organizacao = Organizacao.objects.filter(dono=request.user)
+        organizacao = Organizacao.objects.get(dono=request.user)
     except:
         return HttpResponseForbidden('Acesso negado.')
 
