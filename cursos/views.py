@@ -436,7 +436,7 @@ def lista_topicos(request):
     else:
         form = TopicoDiscussaoForm()
 
-    topicos = TopicoDiscussao.objects.filter(organizao=organizacao_usuario)
+    topicos = TopicoDiscussao.objects.filter(organizacao=organizacao_usuario)
 
     context = {
         'topicos': topicos,

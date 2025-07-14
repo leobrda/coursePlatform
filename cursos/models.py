@@ -154,7 +154,7 @@ class ComentarioTopico(models.Model):
     data_criacao = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['-data_criacao']
+        ordering = ['data_criacao']
         verbose_name = 'Comentário do Tópico'
         verbose_name_plural = 'Comentários de Tópicos'
 

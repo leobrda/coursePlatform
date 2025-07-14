@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ topico.titulo }} - Comunidade</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0; background-color: #f8f9fa;}
+        .header { background-color: #fff; padding: 1em 2em; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .header .logo a { text-decoration: none; color: #343a40; font-size: 1.5em; font-weight: bold;}
+        .header .user-info { display: flex; align-items: center; gap: 1.5em; }
+        .header .user-info a { color: #007bff; text-decoration: none; font-weight: bold; }
+        .header .user-info a.logout { color: #dc3545; }
+        .container { max-width: 1200px; margin: 2em auto; padding: 0 2em; }
+        .topic-post, .comment-section, .comment-form-section { background-color: #fff; padding: 2em; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); margin-bottom: 2em;}
+        .post-header h1 { margin: 0; color: #343a40; }
+        .post-meta { font-size: 0.9em; color: #6c757d; margin-top: 0.5em; }
+        .post-content { margin-top: 1.5em; line-height: 1.7; }
+        .comment { border-bottom: 1px solid #eee; padding: 1.5em 0; }
+        .comment:last-child { border-bottom: none; }
+        .comment-author { font-weight: bold; }
+        .comment-date { font-size: 0.8em; color: #6c757d; margin-left: 0.5em;}
+        .comment-content { margin-top: 0.5em; }
+        .attachment a { font-weight: bold; }
+        .btn { background-color: #007bff; color: white; padding: 0.8em 1.5em; text-decoration: none; border-radius: 4px; font-weight: bold; border: none; cursor: pointer; font-size: 1em;}
+        form label { display: block; margin-bottom: 0.5em; font-weight: bold; }
+        form textarea, form input[type="file"] { width: 100%; padding: 0.8em; border: 1px solid #ddd; border-radius: 4px; font-size: 1em; box-sizing: border-box; margin-bottom: 1em;}
+        .btn-back { display: inline-block; margin-top: 1.5em; color: #6c757d; text-decoration: none; font-weight: bold;}
+    </style>
+</head>
+<body>
+    <header class="header">
+        <!-- AQUI ESTÁ A CORREÇÃO -->
+        <h1><a href="{% url 'home' %}">Plataforma de Cursos</a></h1>
+        <div class="user-info">
+            {% if user.is_authenticated %}
+                <a href="{% url 'cursos:lista_topicos' %}">Comunidade</a>
+                <a href="{% url 'cursos:notificacoes' %}" class="notification-bell">
+                    <span class="bell-icon">🔔</span>
+                    {% if unread_notification_count > 0 %}
+                        <span class="badge">{{ unread_notification_count }}</span>
+                    {% endif %}
+                </a>
+                <span>Olá, {{ user.first_name }}!</span>
+
+                {% if is_org_owner %}
+                    <a href="{% url 'cursos:painel_instrutor' %}">Painel do Instrutor</a>
+                {% else %}
+                    <a href="{% url 'cursos:meu_painel' %}">Minha Conta</a>
+                {% endif %}
+
+                <a href="{% url 'cursos:logout' %}" class="logout">Sair</a>
+            {% endif %}
+        </div>
+    </header>
+    <main class="container">
+        <div class="topic-post">
+            <div class="post-header">
+                <h1>{{ topico.titulo }}</h1>
+                <div class="post-meta">Iniciado por {{ topico.autor.first_name }} em {{ topico.data_criacao|date:"d/m/Y" }}</div>
+            </div>
+            <div class="post-content">
+                {{ topico.conteudo|linebreaks }}
+            </div>
+        </div>
+
+        <div class="comment-section">
+            <h2>Comentários</h2>
+            {% for comentario in topico.comentarios.all %}
+                <div class="comment">
+                    <p>
+                        <span class="comment-author">{{ comentario.autor.first_name }} {{ comentario.autor.last_name }}</span>
+                        <span class="comment-date">comentou em {{ comentario.data_criacao|date:"d/m/Y" }}</span>
+                    </p>
+                    <div class="comment-content">
+                        {{ comentario.conteudo|linebreaks }}
+                    </div>
+                    {% if comentario.arquivo_anexo %}
+                        <p class="attachment">
+                            Anexo: <a href="{{ comentario.arquivo_anexo.url }}" download>{{ comentario.arquivo_anexo.name|cut:"forum/anexos/" }}</a>
+                        </p>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <p>Nenhum comentário ainda. Seja o primeiro a responder!</p>
+            {% endfor %}
+        </div>
+
+        <div class="comment-form-section">
+            <h3>Adicionar seu Comentário</h3>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form_comentario.as_p }}
+                <button type="submit" class="btn">Publicar Comentário</button>
+            </form>
+        </div>
+        <a href="{% url 'cursos:lista_topicos' %}" class="btn-back">&larr; Voltar para todos os tópicos</a>
+    </main>
+</body>
+</html>
