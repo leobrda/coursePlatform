@@ -1,11 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .forms import UserRegistrationForm, UserEditForm, PerguntaForm, RespostaForm, CursoForm, AulaForm, CategoriaForm
+from .forms import UserRegistrationForm, UserEditForm, PerguntaForm, RespostaForm, CursoForm, AulaForm, CategoriaForm, TopicoDiscussaoForm, ComentarioTopicoForm
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.http import Http404, HttpResponseForbidden
-from .models import Curso, Aula, Pergunta, Resposta, Associado, Categoria, Notificacao, Organizacao
+from .models import Curso, Aula, Pergunta, Resposta, Associado, Categoria, Notificacao, Organizacao, TopicoDiscussao, ComentarioTopico
 
 
 def get_user_organization(request):
@@ -417,3 +417,58 @@ def apagar_categoria(request, pk_categoria):
     }
 
     return render(request, 'cursos/apagar_categoria.html', context=context)
+
+
+@login_required
+def lista_topicos(request):
+    organizacao_usuario = get_user_organization(request)
+    if not organizacao_usuario:
+        return render(request, 'cursos/erro_permissao.html')
+
+    if request.method == 'POST':
+        form = TopicoDiscussaoForm(request.POST)
+        if form.is_valid():
+            novo_topico = form.save(commit=False)
+            novo_topico.organizacao = organizacao_usuario
+            novo_topico.autor = request.user
+            novo_topico.save()
+            return redirect('cursos:detalhe_topico', pk_topico=novo_topico.pk)
+    else:
+        form = TopicoDiscussaoForm()
+
+    topicos = TopicoDiscussao.objects.filter(organizao=organizacao_usuario)
+
+    context = {
+        'topicos': topicos,
+        'form': form,
+    }
+
+    return render(request, 'cursos/lista_topicos.html', context=context)
+
+
+@login_required
+def detalhe_topico(request, pk_topico):
+    organizacao_usuario = get_user_organization(request)
+    if not organizacao_usuario:
+        return render(request, 'cursos/erro_permissao.html')
+
+    topico = get_object_or_404(TopicoDiscussao, pk=pk_topico, organizacao=organizacao_usuario)
+
+    if request.method == 'POST':
+        form_comentario = ComentarioTopicoForm(request.POST, request.FILES)
+        if form_comentario.is_valid():
+            novo_comentario = form_comentario.save(commit=False)
+            novo_comentario.topico = topico
+            novo_comentario.autor = request.user
+            novo_comentario.save()
+            return redirect('cursos:detalhe_topico', pk_topico=topico.pk)
+    else:
+        form_comentario = ComentarioTopicoForm()
+
+    context = {
+        'topico': topico,
+        'form_comentario': form_comentario,
+    }
+
+    return render(request, 'cursos/detalhe_topico.html', context=context)
+
