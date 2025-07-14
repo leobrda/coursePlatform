@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Associado, Pergunta, Resposta, Organizacao, Curso, Categoria, Aula
+from .models import Associado, Pergunta, Resposta, Organizacao, Curso, Categoria, Aula, TopicoDiscussao, ComentarioTopico
 import re
 
 
@@ -134,3 +134,29 @@ class CategoriaForm(forms.ModelForm):
         model = Categoria
         fields = ['nome']
 
+
+class TopicoDiscussaoForm(forms.ModelForm):
+    class Meta:
+        model = TopicoDiscussao
+        fields = ['titulo', 'conteudo']
+        widgets = {
+            'titulo': forms.TextInput(attrs={'placeholder': 'Qual o título do tópico?'}),
+            'conteudo': forms.Textarea(attrs={'rows': 15, 'placeholder': 'Comece o tópico aqui...'}),
+        }
+        labels = {
+            'titulo': 'Título',
+            'conteudo': 'Conteúdo do Tópico'
+        }
+
+
+class ComentarioTopicoForm(forms.ModelForm):
+    class Meta:
+        model = ComentarioTopico
+        fields = ['conteudo', 'arquivo_anexo']
+        widgets = {
+            'conteudo': forms.Textarea(attrs={'rows': 15, 'placeholder': 'Adicione o seu comentário...'}),
+        }
+        labels = {
+            'conteudo': 'Seu comentário',
+            'arquivo_anexo': 'Anexar um Ficheiro (Opcional)'
+        }

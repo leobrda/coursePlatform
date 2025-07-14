@@ -122,3 +122,41 @@ class Notificacao(models.Model):
 
     def __str__(self):
         return f'Notificação para {self.destinatario.username} sobre a resposta {self.resposta.id}'
+
+
+class TopicoDiscussao(models.Model):
+    organizacao = models.ForeignKey(Organizacao, on_delete=models.CASCADE, related_name='topicos_discussao')
+    autor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='topicos_criados')
+    titulo = models.CharField(max_length=355, verbose_name='Títullo do Tópico')
+    conteudo = models.TextField(verbose_name='Conteúdo')
+    data_criacao = models.DateTimeField(auto_now_add=True)
+    data_atualizacao = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-data_atualizacao']
+        verbose_name = 'Tópico de Discussão'
+        verbose_name_plural = 'Tópicos de Discussão'
+
+    def __str__(self):
+        return self.titulo
+
+
+class ComentarioTopico(models.Model):
+    topico = models.ForeignKey(TopicoDiscussao, on_delete=models.CASCADE, related_name='comentarios')
+    autor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comentarios_feitos')
+    conteudo = models.TextField(verbose_name='Conteúdo do Comentário')
+    arquivo_anexo = models.FileField(
+        upload_to='forum/anexos/',
+        verbose_name='Anexar Ficheiro',
+        blank=True,
+        null=True,
+    )
+    data_criacao = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['data_criacao']
+        verbose_name = 'Comentário do Tópico'
+        verbose_name_plural = 'Comentários de Tópicos'
+
+    def __str__(self):
+        return f'Comentário de {self.autor.username} em "{self.topico.titulo}"'
