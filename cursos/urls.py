@@ -21,6 +21,7 @@ from .views import (
     apagar_categoria,
     lista_topicos,
     detalhe_topico,
+    inscrever_curso,
 )
 
 app_name = 'cursos'
@@ -33,6 +34,7 @@ urlpatterns = [
     path('logout/', logout_view, name='logout'),
 
     path('curso/<int:pk>/', detalhe_curso, name='detalhe_curso'),
+    path('curso/<int:pk_curso>/inscrever/', inscrever_curso, name='inscrever_curso'),
     path('aula/<int:pk>/', ver_aula, name='ver_aula'),
     path('resposta/<int:pk_resposta>/votar/', votar_resposta, name='votar_resposta'),
     path('aula/<int:pk_aula>/concluir/', marcar_aula_concluida, name='marcar_aula_concluida'),
