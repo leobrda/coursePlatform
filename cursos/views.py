@@ -472,3 +472,16 @@ def detalhe_topico(request, pk_topico):
 
     return render(request, 'cursos/detalhe_topico.html', context=context)
 
+
+@login_required
+def inscrever_curso(request, pk_curso):
+    curso = get_object_or_404(Curso, pk=pk_curso)
+    associado = get_object_or_404(Associado, usuario=request.user)
+
+    if curso in associado.cursos_inscritos.all():
+        associado.cursos_inscritos.remove(curso)
+    else:
+        associado.cursos_inscritos.add(curso)
+
+    return redirect('cursos:detalhe_curso', pk=curso.pk)
+
