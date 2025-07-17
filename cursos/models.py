@@ -19,6 +19,7 @@ class Associado(models.Model):
     biografia = models.TextField(blank=True, verbose_name='Biografia')
     aprovado = models.BooleanField(default=False, verbose_name='Cadastro Aprovado')
     aulas_concluidas = models.ManyToManyField('Aula', related_name='concluida_por', blank=True)
+    cursos_inscritos = models.ManyToManyField('Curso', related_name='inscritos', blank=True)
 
     def __str__(self):
         return self.usuario.username
