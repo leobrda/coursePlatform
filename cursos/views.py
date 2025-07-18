@@ -204,7 +204,7 @@ def marcar_aula_concluida(request, pk_aula):
 @login_required
 def lista_notificacoes(request):
     notificacoes = Notificacao.objects.filter(destinatario=request.user)
-    notificacoes.update(lida=True)
+    notificacoes.filter(lida=False).update(lida=True)
 
     context = {
         'notificacoes': notificacoes,
