@@ -8,21 +8,36 @@
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0; background-color: #f8f9fa;}
         .header { background-color: #fff; padding: 1em 2em; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
         .header .logo a { text-decoration: none; color: #343a40; font-size: 1.5em; font-weight: bold;}
-        .header .user-info a { color: #007bff; text-decoration: none; font-weight: bold; margin-left: 1em; }
+        .header .user-info { display: flex; align-items: center; gap: 1.5em; }
+        .header .user-info a { color: #007bff; text-decoration: none; font-weight: bold; }
         .header .user-info a.logout { color: #dc3545; }
         .container { max-width: 900px; margin: 2em auto; padding: 0 2em; }
         .notification-list { background-color: #fff; padding: 2em; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.05);}
         .notification-list h1 { margin-top: 0; }
         .notification-item { border-bottom: 1px solid #eee; padding: 1.5em 0; }
         .notification-item:last-child { border-bottom: none; }
-        .notification-item a { text-decoration: none; color: inherit; }
+        .notification-item a { text-decoration: none; color: inherit; display: block; }
         .notification-item p { margin: 0; line-height: 1.6; }
         .notification-date { font-size: 0.8em; color: #6c757d; }
+
+        /* Estilos para o sino de notificação */
+        .notification-bell { position: relative; }
+        .notification-bell .bell-icon { font-size: 1.5em; color: #6c757d; }
+        .notification-bell .badge {
+            position: absolute;
+            top: -5px;
+            right: -10px;
+            padding: 2px 6px;
+            border-radius: 50%;
+            background-color: #dc3545;
+            color: white;
+            font-size: 0.75em;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
     <header class="header">
-        <!-- AQUI ESTÁ A CORREÇÃO -->
         <h1><a href="{% url 'home' %}">Plataforma de Cursos</a></h1>
         <div class="user-info">
             {% if user.is_authenticated %}
@@ -51,13 +66,28 @@
             <h1>Minhas Notificações</h1>
             {% for notificacao in notificacoes %}
                 <div class="notification-item">
-                    <a href="{% url 'cursos:ver_aula' pk=notificacao.resposta.pergunta.aula.pk %}">
-                        <p>
-                            <strong>{{ notificacao.resposta.usuario.first_name }}</strong> respondeu à sua pergunta na aula
-                            <strong>"{{ notificacao.resposta.pergunta.aula.titulo }}"</strong>.
-                        </p>
-                        <span class="notification-date">{{ notificacao.data_criacao|date:"d/m/Y, H:i" }}</span>
-                    </a>
+
+                    <!-- AQUI ESTÁ A LÓGICA INTELIGENTE -->
+                    {% if notificacao.resposta %}
+                        <!-- Se a notificação for sobre uma RESPOSTA -->
+                        <a href="{% url 'cursos:ver_aula' pk=notificacao.resposta.pergunta.aula.pk %}">
+                            <p>
+                                <strong>{{ notificacao.resposta.usuario.first_name }}</strong> respondeu à sua pergunta na aula
+                                <strong>"{{ notificacao.resposta.pergunta.aula.titulo }}"</strong>.
+                            </p>
+                            <span class="notification-date">{{ notificacao.data_criacao|date:"d/m/Y, H:i" }}</span>
+                        </a>
+                    {% elif notificacao.pergunta %}
+                        <!-- Se a notificação for sobre uma PERGUNTA -->
+                        <a href="{% url 'cursos:ver_aula' pk=notificacao.pergunta.aula.pk %}">
+                            <p>
+                                <strong>{{ notificacao.pergunta.usuario.first_name }}</strong> fez uma nova pergunta na aula
+                                <strong>"{{ notificacao.pergunta.aula.titulo }}"</strong>.
+                            </p>
+                            <span class="notification-date">{{ notificacao.data_criacao|date:"d/m/Y, H:i" }}</span>
+                        </a>
+                    {% endif %}
+
                 </div>
             {% empty %}
                 <p>Você não tem nenhuma notificação.</p>
