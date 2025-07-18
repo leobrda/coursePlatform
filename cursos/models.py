@@ -113,7 +113,8 @@ class Resposta(models.Model):
 
 class Notificacao(models.Model):
     destinatario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notificacoes')
-    resposta = models.ForeignKey(Resposta, on_delete=models.CASCADE)
+    resposta = models.ForeignKey(Resposta, on_delete=models.CASCADE, null=True, blank=True)
+    pergunta = models.ForeignKey(Pergunta, on_delete=models.CASCADE, null=True, blank=True)
     lida = models.BooleanField(default=False)
     data_criacao = models.DateTimeField(auto_now_add=True)
 
@@ -122,7 +123,11 @@ class Notificacao(models.Model):
         verbose_name_plural = 'Notificações'
 
     def __str__(self):
-        return f'Notificação para {self.destinatario.username} sobre a resposta {self.resposta.id}'
+        if self.resposta:
+            return f'Notificação para {self.destinatario.username} sobre a resposta {self.resposta.id}'
+        elif self.pergunta:
+            return f'Notificação para {self.destinatario.username} sobre a pergunta {self.pergunta.id}'
+        return f'Notificação para {self.destinatario.username}'
 
 
 class TopicoDiscussao(models.Model):
