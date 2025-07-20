@@ -7,11 +7,19 @@ from .models import Resposta, Pergunta, Notificacao
 def criar_notificacao_de_resposta(sender, instance, created, **kwargs):
     if created:
         pergunta = instance.pergunta
-        autor_pergunta = pergunta.usuario
+        autor_da_resposta_atual = instance.usuario
+        participantes = {pergunta.usuario}
 
-        if instance.usuario != autor_pergunta:
+        respostas_anteriores = Resposta.objects.filter(pergunta=pergunta)
+        for resposta in respostas_anteriores:
+            participantes.add(resposta.autor)
+
+        if autor_da_resposta_atual in participantes:
+            participantes.remove(autor_da_resposta_atual)
+
+        for participante in participantes:
             Notificacao.objects.create(
-                destinatario=autor_pergunta,
+                destinatario=participante,
                 resposta=instance
             )
 
