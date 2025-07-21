@@ -1,32 +1,39 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Categoria - Painel do Instrutor</title>
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0; background-color: #f8f9fa;}
-        .container { max-width: 800px; margin: 2em auto; padding: 0 2em; }
-        .form-container { background: #fff; padding: 2em; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
-        h1 { margin-top: 0; }
-        form p { margin-bottom: 1.2em; }
-        form label { display: block; margin-bottom: 0.5em; font-weight: bold; }
-        form input[type="text"] { width: 100%; padding: 0.8em; border: 1px solid #ddd; border-radius: 4px; font-size: 1em; box-sizing: border-box;}
-        .btn { background-color: #007bff; color: white; padding: 1em; border: none; border-radius: 4px; cursor: pointer; font-size: 1em;}
-        .btn-back { display: inline-block; margin-top: 1em; color: #6c757d; text-decoration: none; }
-    </style>
-</head>
-<body>
-    <main class="container">
-        <div class="form-container">
-            <h1>Editar Categoria: "{{ categoria.nome }}"</h1>
-            <form method="post">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="btn">Salvar Alterações</button>
-            </form>
-            <a href="{% url 'cursos:gerir_categorias' %}" class="btn-back">&larr; Cancelar</a>
+{% extends 'base.html' %}
+
+{% block title %}
+    Editar Categoria - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h1 class="h4 mb-0">Editar Categoria: "{{ categoria.nome }}"</h1>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        {% for field in form %}
+                            <div class="mb-3">
+                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ field.errors|striptags }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'cursos:gerir_categorias' %}" class="btn btn-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-    </main>
-</body>
-</html>
+    </div>
+</div>
+{% endblock %}
