@@ -12,7 +12,7 @@ def criar_notificacao_de_resposta(sender, instance, created, **kwargs):
 
         respostas_anteriores = Resposta.objects.filter(pergunta=pergunta)
         for resposta in respostas_anteriores:
-            participantes.add(resposta.autor)
+            participantes.add(resposta.usuario)
 
         if autor_da_resposta_atual in participantes:
             participantes.remove(autor_da_resposta_atual)
