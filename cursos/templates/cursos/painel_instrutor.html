@@ -1,139 +1,113 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel do Instrutor - Plataforma de Cursos</title>
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0; background-color: #f8f9fa;}
-        .header { background-color: #fff; padding: 1em 2em; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
-        .header .logo a { text-decoration: none; color: #343a40; font-size: 1.5em; font-weight: bold;}
-        .header .user-info { display: flex; align-items: center; gap: 1.5em; }
-        .header .user-info a { color: #007bff; text-decoration: none; font-weight: bold; }
-        .header .user-info a.logout { color: #dc3545; }
-        .container { max-width: 1200px; margin: 2em auto; padding: 0 2em; }
+{% extends 'base.html' %}
 
-        /* Estilos do Painel */
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5em; margin-bottom: 2em;}
-        .stat-card { background-color: #fff; padding: 1.5em; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); text-align: center;}
-        .stat-card .number { font-size: 2.5em; font-weight: bold; color: #007bff; }
-        .stat-card .label { font-size: 1em; color: #6c757d; margin-top: 0.5em; }
+{% block title %}
+    Painel do Instrutor - {{ block.super }}
+{% endblock %}
 
-        .management-section { background-color: #fff; padding: 2em; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
-        .management-section h2 { margin-top: 0; }
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em; }
-        .section-header h2 { margin: 0; }
-        .user-list { list-style: none; padding: 0; }
-        .user-item { display: flex; justify-content: space-between; align-items: center; padding: 1em 0; border-bottom: 1px solid #eee; }
-        .user-item:last-child { border-bottom: none; }
-        .user-details { display: flex; flex-direction: column; }
-        .user-details .name { font-weight: bold; }
-        .user-details .email { font-size: 0.9em; color: #6c757d; }
-        .btn-approve { background-color: #28a745; color: white; padding: 0.5em 1em; text-decoration: none; border-radius: 4px; font-weight: bold; }
-    </style>
-</head>
-<body>
+{% block content %}
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2">Painel de Controlo</h1>
+        <span class="text-muted">Organização: <strong>{{ organizacao.nome }}</strong></span>
+    </div>
 
-    <header class="header">
-        <!-- AQUI ESTÁ A CORREÇÃO -->
-        <h1><a href="{% url 'home' %}">Plataforma de Cursos</a></h1>
-        <div class="user-info">
-            {% if user.is_authenticated %}
-                <a href="{% url 'cursos:lista_topicos' %}">Comunidade</a>
-                <a href="{% url 'cursos:notificacoes' %}" class="notification-bell">
-                    <span class="bell-icon">🔔</span>
-                    {% if unread_notification_count > 0 %}
-                        <span class="badge">{{ unread_notification_count }}</span>
+    <!-- Cartões de Estatísticas -->
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card text-center h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Total de Associados</h5>
+                    <p class="display-4 fw-bold">{{ total_associados }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card text-center h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Cursos Publicados</h5>
+                    <p class="display-4 fw-bold">{{ total_cursos }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card text-center h-100 shadow-sm {% if associados_pendentes.count > 0 %}border-warning{% endif %}">
+                <div class="card-body">
+                    <h5 class="card-title">Cadastros Pendentes</h5>
+                    <p class="display-4 fw-bold text-warning">{{ associados_pendentes.count }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Secções de Gestão -->
+    <div class="row">
+        <!-- Aprovar Associados -->
+        <div class="col-12 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h2 class="h5 mb-0">Aprovar Novos Associados</h2>
+                </div>
+                <div class="card-body">
+                    {% if associados_pendentes %}
+                        <ul class="list-group list-group-flush">
+                            {% for associado in associados_pendentes %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>{{ associado.usuario.get_full_name }}</strong>
+                                        <small class="text-muted d-block">{{ associado.usuario.email }}</small>
+                                    </div>
+                                    <a href="{% url 'cursos:aprovar_associado' pk_associado=associado.pk %}" class="btn btn-success btn-sm">Aprovar</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted mb-0">Não há nenhum cadastro pendente de aprovação no momento.</p>
                     {% endif %}
-                </a>
-                <span>Olá, {{ user.first_name }}!</span>
-
-                {% if is_org_owner %}
-                    <a href="{% url 'cursos:painel_instrutor' %}">Painel do Instrutor</a>
-                {% else %}
-                    <a href="{% url 'cursos:meu_painel' %}">Minha Conta</a>
-                {% endif %}
-
-                <a href="{% url 'cursos:logout' %}" class="logout">Sair</a>
-            {% endif %}
-        </div>
-    </header>
-
-    <main class="container">
-        <h1>Painel de Controle da Organização "{{ organizacao.nome }}"</h1>
-
-        <div class="dashboard-grid">
-            <div class="stat-card">
-                <div class="number">{{ total_associados }}</div>
-                <div class="label">Total de Associados</div>
-            </div>
-            <div class="stat-card">
-                <div class="number">{{ total_cursos }}</div>
-                <div class="label">Cursos Publicados</div>
-            </div>
-            <div class="stat-card">
-                <div class="number">{{ associados_pendentes.count }}</div>
-                <div class="label">Cadastros Pendentes</div>
+                </div>
             </div>
         </div>
 
-        <div class="management-section">
-            <h2>Aprovar Novos Associados</h2>
-            {% if associados_pendentes %}
-                <ul class="user-list">
-                    {% for associado in associados_pendentes %}
-                        <li class="user-item">
-                            <div class="user-details">
-                                <span class="name">{{ associado.usuario.first_name }} {{ associado.usuario.last_name }}</span>
-                                <span class="email">{{ associado.usuario.email }}</span>
-                            </div>
-                            <div>
-                                <!-- Futuramente, este botão irá acionar uma view para aprovar o utilizador -->
-                                <a href="{% url 'cursos:aprovar_associado' pk_associado=associado.pk %}" class="btn-approve">Aprovar</a>
-                            </div>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>Não há nenhum cadastro pendente de aprovação no momento.</p>
-            {% endif %}
-        </div>
-
-        <div class="management-section">
-            <div class="section-header">
-                <h2>Meus Cursos</h2>
-                <a href="{% url 'cursos:criar_curso' %}" class="btn">Adicionar Novo Curso</a>
+        <!-- Gerir Cursos -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h2 class="h5 mb-0">Meus Cursos</h2>
+                    <a href="{% url 'cursos:criar_curso' %}" class="btn btn-primary btn-sm">Adicionar Curso</a>
+                </div>
+                <div class="card-body">
+                    {% if cursos %}
+                        <ul class="list-group list-group-flush">
+                            {% for curso in cursos %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    {{ curso.titulo }}
+                                    <div>
+                                        <a href="{% url 'cursos:editar_curso' pk=curso.pk %}" class="btn btn-outline-secondary btn-sm">Detalhes</a>
+                                        <a href="{% url 'cursos:gerir_aulas' pk_curso=curso.pk %}" class="btn btn-outline-info btn-sm">Aulas</a>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted mb-0">Você ainda não criou nenhum curso.</p>
+                    {% endif %}
+                </div>
             </div>
-            {% if cursos %}
-                <ul class="item-list">
-                    {% for curso in cursos %}
-                        <li class="item">
-                            <div class="item-details">
-                                <span class="name">{{ curso.titulo }}</span>
-                                <span class="meta">Criado em: {{ curso.data_criacao|date:"d/m/Y" }}</span>
-                            </div>
-                            <div class="item-actions">
-                                <!-- Botão para editar os DETALHES do curso -->
-                                <a href="{% url 'cursos:editar_curso' pk=curso.pk %}" class="btn btn-edit">Editar Detalhes</a>
-                                <!-- Botão para gerir as AULAS do curso -->
-                                <a href="{% url 'cursos:gerir_aulas' pk_curso=curso.pk %}" class="btn btn-manage-lessons">Editar Aulas</a>
-                            </div>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>Você ainda não criou nenhum curso.</p>
-            {% endif %}
         </div>
 
-        <div class="management-section">
-            <div class="section-header">
-                <h2>Minhas Categorias</h2>
-                <a href="{% url 'cursos:gerir_categorias' %}" class="btn btn-manage">Gerir Categorias</a>
+        <!-- Gerir Categorias -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header">
+                    <h2 class="h5 mb-0">Minhas Categorias</h2>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Adicione, edite ou apague as categorias usadas para organizar os seus cursos.</p>
+                </div>
+                <div class="card-footer bg-transparent border-0 pb-3 text-center">
+                    <a href="{% url 'cursos:gerir_categorias' %}" class="btn btn-secondary">Gerir Categorias</a>
+                </div>
             </div>
-            <p>Adicione, edite ou apague as categorias usadas para organizar os seus cursos.</p>
         </div>
-    </main>
-
-</body>
-</html>
+    </div>
+</div>
+{% endblock %}
