@@ -16,6 +16,11 @@ class Organizacao(models.Model):
 class Associado(models.Model):
     usuario = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Usuário')
     organizacao = models.ForeignKey(Organizacao, on_delete=models.CASCADE, related_name='associados')
+    foto_perfil = models.ImageField(
+        upload_to='perfil_fotos/',
+        null=True,
+        blank=True
+    )
     biografia = models.TextField(blank=True, verbose_name='Biografia')
     aprovado = models.BooleanField(default=False, verbose_name='Cadastro Aprovado')
     aulas_concluidas = models.ManyToManyField('Aula', related_name='concluida_por', blank=True)

@@ -42,6 +42,7 @@ class UserRegistrationForm(forms.ModelForm):
 
 class UserEditForm(forms.ModelForm):
     biografia = forms.CharField(label='Biografia', widget=forms.Textarea, required=False)
+    foto_perfil = forms.ImageField(label='Foto de Perfil', required=False)
 
     class Meta:
         model = User
@@ -52,12 +53,16 @@ class UserEditForm(forms.ModelForm):
 
         if hasattr(self.instance, 'associado'):
             self.fields['biografia'].initial = self.instance.associado.biografia
+            self.fields['foto_perfil'].initial = self.instance.associado.foto_perfil
 
     def save(self, commit=True):
         user = super().save(commit=commit)
 
         if hasattr(user, 'associado'):
             user.associado.biografia = self.cleaned_data['biografia']
+            nova_foto = self.cleaned_data.get('foto_perfil')
+            if nova_foto:
+                user.associado.foto_perfil = nova_foto
             if commit:
                 user.associado.save()
 

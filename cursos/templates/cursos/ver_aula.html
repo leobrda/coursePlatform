@@ -68,36 +68,54 @@
 
                     <!-- Lista de Perguntas -->
                     {% for pergunta in perguntas %}
-                        <div class="mb-3">
-                            <p class="mb-1">
-                                <strong>{{ pergunta.usuario.first_name }}</strong> <small class="text-muted">{{ pergunta.data_criacao|date:"d/m/Y" }}</small>
-                            </p>
-                            <p>{{ pergunta.conteudo|linebreaks }}</p>
+                        <div class="d-flex mb-4">
+                            <div class="flex-shrink-0">
+                                {% if pergunta.usuario.associado.foto_perfil %}
+                                    <img src="{{ pergunta.usuario.associado.foto_perfil.url }}" class="rounded-circle" alt="Avatar" width="50" height="50" style="object-fit: cover;">
+                                {% else %}
+                                    <img src="https://placehold.co/50x50/EBF0F8/7F9CF5?text={{ pergunta.usuario.first_name|first }}" class="rounded-circle" alt="Avatar Padrão">
+                                {% endif %}
+                            </div>
+                            <div class="ms-3 flex-grow-1">
+                                <p class="mb-1">
+                                    <strong>{{ pergunta.usuario.first_name }}</strong> <small class="text-muted">{{ pergunta.data_criacao|date:"d/m/Y" }}</small>
+                                </p>
+                                <p>{{ pergunta.conteudo|linebreaks }}</p>
 
-                            <!-- Respostas -->
-                            {% for resposta in pergunta.get_respostas_ordenadas %}
-                                <div class="ps-3 mt-2 border-start">
-                                    <p class="mb-1">
-                                        <strong>{{ resposta.usuario.first_name }}</strong> <small class="text-muted">{{ resposta.data_criacao|date:"d/m/Y" }}</small>
-                                    </p>
-                                    <p>{{ resposta.conteudo|linebreaks }}</p>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <a href="{% url 'cursos:votar_resposta' pk_resposta=resposta.pk %}" class="btn {% if user in resposta.votos.all %}btn-primary{% else %}btn-outline-primary{% endif %} btn-sm">
-                                            👍 {{ resposta.total_votos }}
-                                        </a>
+                                <!-- Respostas -->
+                                {% for resposta in pergunta.get_respostas_ordenadas %}
+                                    <div class="d-flex mt-3">
+                                        <div class="flex-shrink-0">
+                                            {% if resposta.usuario.associado.foto_perfil %}
+                                                <img src="{{ resposta.usuario.associado.foto_perfil.url }}" class="rounded-circle" alt="Avatar" width="40" height="40" style="object-fit: cover;">
+                                            {% else %}
+                                                <img src="https://placehold.co/40x40/EBF0F8/7F9CF5?text={{ resposta.usuario.first_name|first }}" class="rounded-circle" alt="Avatar Padrão">
+                                            {% endif %}
+                                        </div>
+                                        <div class="ms-3 flex-grow-1">
+                                            <p class="mb-1">
+                                                <strong>{{ resposta.usuario.first_name }}</strong> <small class="text-muted">{{ resposta.data_criacao|date:"d/m/Y" }}</small>
+                                            </p>
+                                            <p>{{ resposta.conteudo|linebreaks }}</p>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <a href="{% url 'cursos:votar_resposta' pk_resposta=resposta.pk %}" class="btn {% if user in resposta.votos.all %}btn-primary{% else %}btn-outline-primary{% endif %} btn-sm">
+                                                    👍 {{ resposta.total_votos }}
+                                                </a>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            {% endfor %}
+                                {% endfor %}
 
-                            <!-- Formulário de Resposta -->
-                            <form method="post" action="{% url 'cursos:ver_aula' pk=aula.pk %}" class="mt-3">
-                                {% csrf_token %}
-                                <input type="hidden" name="pergunta_id" value="{{ pergunta.pk }}">
-                                <div class="mb-2">
-                                    {{ form_resposta.conteudo }}
-                                </div>
-                                <button type="submit" name="submit_resposta" class="btn btn-secondary btn-sm">Responder</button>
-                            </form>
+                                <!-- Formulário de Resposta -->
+                                <form method="post" action="{% url 'cursos:ver_aula' pk=aula.pk %}" class="mt-3">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="pergunta_id" value="{{ pergunta.pk }}">
+                                    <div class="mb-2">
+                                        {{ form_resposta.conteudo }}
+                                    </div>
+                                    <button type="submit" name="submit_resposta" class="btn btn-secondary btn-sm">Responder</button>
+                                </form>
+                            </div>
                         </div>
                     {% empty %}
                         <p class="text-muted text-center">Nenhuma pergunta ainda. Seja o primeiro!</p>
