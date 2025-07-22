@@ -22,6 +22,9 @@
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {% if user.associado.foto_perfil %}
+                                <img src="{{ user.associado.foto_perfil.url }}" class="rounded-circle me-2" alt="Foto de Perfil" width="32" height="32" style="object-fit: cover;">
+                            {% endif %}
                             Olá, {{ user.first_name|default:user.username }}!
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
