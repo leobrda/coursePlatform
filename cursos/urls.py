@@ -22,6 +22,8 @@ from .views import (
     lista_topicos,
     detalhe_topico,
     inscrever_curso,
+    gerir_quiz_curso,
+    gerir_pergunta_quiz,
 )
 
 app_name = 'cursos'
@@ -54,6 +56,10 @@ urlpatterns = [
     path('meu-painel-instrutor/categorias/', gerir_categorias, name='gerir_categorias'),
     path('meu-painel-instrutor/categorias/<int:pk_categoria>/editar/', editar_categoria, name='editar_categoria'),
     path('meu-painel-instrutor/categorias/<int:pk_categoria>/apagar/', apagar_categoria, name='apagar_categoria'),
+
+    path('meu-painel-instrutor/cursos/<int:pk_curso>/quiz/', gerir_quiz_curso, name='gerir_quiz_curso'),
+    path('meu-painel-instrutor/cursos/<int:pk_curso>/quiz/perguntas/nova/', gerir_pergunta_quiz, name='adicionar_pergunta_quiz'),
+    path('meu-painel-instrutor/cursos/<int:pk_curso>/quiz/perguntas/<int:pk_pergunta>/editar/', gerir_pergunta_quiz, name='editar_pergunta_quiz'),
 
     path('comunidade/', lista_topicos, name='lista_topicos'),
     path('comunidade/topico/<int:pk_topico>/', detalhe_topico, name='detalhe_topico'),
