@@ -1,11 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .forms import UserRegistrationForm, UserEditForm, PerguntaForm, RespostaForm, CursoForm, AulaForm, CategoriaForm, TopicoDiscussaoForm, ComentarioTopicoForm
+from .forms import UserRegistrationForm, UserEditForm, PerguntaForm, RespostaForm, CursoForm, AulaForm, CategoriaForm, TopicoDiscussaoForm, ComentarioTopicoForm, PerguntaQuizForm, OpcaoRespostaFormSet
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.http import Http404, HttpResponseForbidden
-from .models import Curso, Aula, Pergunta, Resposta, Associado, Categoria, Notificacao, Organizacao, TopicoDiscussao, ComentarioTopico
+from .models import Curso, Aula, Pergunta, Resposta, Associado, Categoria, Notificacao, Organizacao, TopicoDiscussao, ComentarioTopico, Quiz, PerguntaQuiz, OpcaoResposta
 
 
 def get_user_organization(request):
@@ -487,3 +487,63 @@ def inscrever_curso(request, pk_curso):
 
     return redirect('cursos:detalhe_curso', pk=curso.pk)
 
+
+@login_required
+def gerir_quiz_curso(request, pk_curso):
+    try:
+        organizacao = Organizacao.objects.get(dono=request.user)
+    except:
+        return HttpResponseForbidden('Acesso negado.')
+
+    curso = get_object_or_404(Curso, pk=pk_curso, organizacao=organizacao)
+
+    quiz = Quiz.objects.filter(curso=curso).first()
+
+    if request.method == 'POST':
+        if not quiz:
+            Quiz.objects.create(curso=curso, titulo=f'Avaliação do curso {curso.titulo}')
+            return redirect('cursos:gerir_quiz_curso', pk_curso=curso.pk)
+
+    context = {
+        'curso': curso,
+        'quiz': quiz
+    }
+    return render(request, 'cursos/gerir_quiz_curso.html', context=context)
+
+
+@login_required
+def gerir_pergunta_quiz(request, pk_curso, pk_pergunta=None):
+    try:
+        organizacao = Organizacao.objects.get(dono=request.user)
+    except:
+        return HttpResponseForbidden('Acesso negado.')
+
+    curso = get_object_or_404(Curso, pk=pk_curso, organizacao=organizacao)
+    quiz = get_object_or_404(Quiz, curso=curso)
+    pergunta = None
+
+    if pk_pergunta:
+        pergunta =get_object_or_404(PerguntaQuiz, pk=pk_pergunta, quiz=quiz)
+
+    if request.method == 'POST':
+        form = PerguntaQuizForm(request.POST, instance=pergunta)
+        formset = OpcaoRespostaFormSet(request.POST, instance=pergunta)
+        if form.is_valid() and formset.is_valid():
+            nova_pergunta = form.save(commit=False)
+            nova_pergunta.quiz = quiz
+            nova_pergunta.save()
+
+            formset.instance = nova_pergunta
+            formset.save()
+
+            return redirect('cursos:gerir_quiz_curso', pk_curso=curso.pk)
+    else:
+        form = PerguntaQuizForm(instance=pergunta)
+        formset = OpcaoRespostaFormSet(instance=pergunta)
+
+    context = {
+        'form': form,
+        'formset': formset,
+        'curso': curso,
+    }
+    return render(request, 'cursos/pergunta_quiz_form.html', context=context)

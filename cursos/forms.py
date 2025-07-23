@@ -1,6 +1,8 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Associado, Pergunta, Resposta, Organizacao, Curso, Categoria, Aula, TopicoDiscussao, ComentarioTopico
+from django.forms import inlineformset_factory
+
+from .models import Associado, Pergunta, Resposta, Organizacao, Curso, Categoria, Aula, TopicoDiscussao, ComentarioTopico, PerguntaQuiz, OpcaoResposta
 import re
 
 
@@ -165,3 +167,25 @@ class ComentarioTopicoForm(forms.ModelForm):
             'conteudo': 'Seu comentário',
             'arquivo_anexo': 'Anexar um Ficheiro (Opcional)'
         }
+
+
+class PerguntaQuizForm(forms.ModelForm):
+    class Meta:
+        model = PerguntaQuiz
+        fields = ['texto']
+        labels = {
+            'texto': 'Texto da Pergunta'
+        }
+        widgets = {
+            'texto': forms.Textarea(attrs={'rows': 3}),
+        }
+
+
+OpcaoRespostaFormSet = inlineformset_factory(
+    PerguntaQuiz,
+    OpcaoResposta,
+    fields=('texto', 'correta'),
+    extra=4,
+    max_num=4,
+    can_delete=False
+)
