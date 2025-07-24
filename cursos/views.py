@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .forms import UserRegistrationForm, UserEditForm, PerguntaForm, RespostaForm, CursoForm, AulaForm, CategoriaForm, TopicoDiscussaoForm, ComentarioTopicoForm, PerguntaQuizForm, OpcaoRespostaFormSet
+from .forms import UserRegistrationForm, UserEditForm, PerguntaForm, RespostaForm, CursoForm, AulaForm, CategoriaForm, TopicoDiscussaoForm, ComentarioTopicoForm, PerguntaQuizForm, OpcaoRespostaForm
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.contrib.auth import logout
@@ -492,11 +492,10 @@ def inscrever_curso(request, pk_curso):
 def gerir_quiz_curso(request, pk_curso):
     try:
         organizacao = Organizacao.objects.get(dono=request.user)
-    except:
+    except Organizacao.DoesNotExist:
         return HttpResponseForbidden('Acesso negado.')
 
     curso = get_object_or_404(Curso, pk=pk_curso, organizacao=organizacao)
-
     quiz = Quiz.objects.filter(curso=curso).first()
 
     if request.method == 'POST':
@@ -504,15 +503,15 @@ def gerir_quiz_curso(request, pk_curso):
             Quiz.objects.create(curso=curso, titulo=f'Avaliação do curso {curso.titulo}')
             return redirect('cursos:gerir_quiz_curso', pk_curso=curso.pk)
 
-    context = {
+    contexto = {
         'curso': curso,
-        'quiz': quiz
+        'quiz': quiz,
     }
-    return render(request, 'cursos/gerir_quiz_curso.html', context=context)
+    return render(request, 'cursos/gerir_quiz_curso.html', contexto)
 
 
 @login_required
-def gerir_pergunta_quiz(request, pk_curso, pk_pergunta=None):
+def pergunta_quiz_form(request, pk_curso, pk_pergunta=None):
     try:
         organizacao = Organizacao.objects.get(dono=request.user)
     except:
@@ -520,30 +519,113 @@ def gerir_pergunta_quiz(request, pk_curso, pk_pergunta=None):
 
     curso = get_object_or_404(Curso, pk=pk_curso, organizacao=organizacao)
     quiz = get_object_or_404(Quiz, curso=curso)
-    pergunta = None
 
+    pergunta=None
     if pk_pergunta:
-        pergunta =get_object_or_404(PerguntaQuiz, pk=pk_pergunta, quiz=quiz)
+        pergunta = get_object_or_404(PerguntaQuiz, pk=pk_pergunta, quiz=quiz)
 
     if request.method == 'POST':
         form = PerguntaQuizForm(request.POST, instance=pergunta)
-        formset = OpcaoRespostaFormSet(request.POST, instance=pergunta)
-        if form.is_valid() and formset.is_valid():
+        if form.is_valid():
             nova_pergunta = form.save(commit=False)
             nova_pergunta.quiz = quiz
             nova_pergunta.save()
+            return redirect('cursos:gerir_opcoes_pergunta', pk_pergunta=nova_pergunta.pk)
 
-            formset.instance = nova_pergunta
-            formset.save()
-
-            return redirect('cursos:gerir_quiz_curso', pk_curso=curso.pk)
     else:
         form = PerguntaQuizForm(instance=pergunta)
-        formset = OpcaoRespostaFormSet(instance=pergunta)
 
     context = {
         'form': form,
-        'formset': formset,
         'curso': curso,
+        'pergunta': pergunta,
     }
+
     return render(request, 'cursos/pergunta_quiz_form.html', context=context)
+
+
+@login_required
+def gerir_opcoes_pergunta(request, pk_pergunta):
+    try:
+        organizacao = Organizacao.objects.get(dono=request.user)
+    except Organizacao.DoesNotExist:
+        return HttpResponseForbidden('Acesso negado.')
+
+    pergunta = get_object_or_404(PerguntaQuiz, pk=pk_pergunta, quiz__curso__organizacao=organizacao)
+
+    if request.method == 'POST':
+        form = OpcaoRespostaForm(request.POST)
+        if form.is_valid():
+            opcoes_existentes = OpcaoResposta.objects.filter(pergunta=pergunta)
+            if opcoes_existentes.count() >= 4:
+                messages.error(request, 'Uma pergunta não pode ter mais de 4 opções.')
+            else:
+                if form.cleaned_data['correta']:
+                    opcoes_existentes.update(correta=False)
+
+                nova_opcao = form.save(commit=False)
+                nova_opcao.pergunta = pergunta
+                nova_opcao.save()
+                messages.success(request, 'Opção adicionada com sucesso!')
+                return redirect('cursos:gerir_opcoes_pergunta', pk_pergunta=pergunta.pk)
+    else:
+        form = OpcaoRespostaForm()
+
+    opcoes = OpcaoResposta.objects.filter(pergunta=pergunta)
+    context = {
+        'pergunta': pergunta,
+        'opcoes': opcoes,
+        'form': form,
+    }
+    return render(request, 'cursos/gerir_opcoes_pergunta.html', context=context)
+
+
+@login_required
+def editar_opcao_resposta(request, pk_opcao):
+    try:
+        organizacao = Organizacao.objects.get(dono=request.user)
+    except Organizacao.DoesNotExist:
+        return HttpResponseForbidden('Acesso negado.')
+
+    opcao = get_object_or_404(OpcaoResposta, pk=pk_opcao, pergunta__quiz__curso__organizacao=organizacao)
+    pergunta = opcao.pergunta
+
+    if request.method == 'POST':
+        form = OpcaoRespostaForm(request.POST, instance=opcao)
+        if form.is_valid():
+            if form.cleaned_data['correta']:
+                pergunta.opcoes.exclude(pk=opcao.pk).update(correta=False)
+
+            form.save()
+            messages.success(request, 'Opção atualizada com sucesso!')
+            return redirect('cursos:gerir_opcoes_pergunta', pk_pergunta=pergunta.pk)
+    else:
+        form = OpcaoRespostaForm(instance=opcao)
+
+    context = {
+        'form': form,
+        'pergunta': pergunta,
+    }
+    return render(request, 'cursos/editar_opcao_resposta.html', context=context)
+
+
+@login_required
+def apagar_opcao_resposta(request, pk_opcao):
+    try:
+        organizacao = Organizacao.objects.get(dono=request.user)
+    except Organizacao.DoesNotExist:
+        return HttpResponseForbidden('Acesso negado.')
+
+    opcao = get_object_or_404(OpcaoResposta, pk=pk_opcao, pergunta__quiz__curso__organizacao=organizacao)
+    pergunta = opcao.pergunta
+
+    if request.method == 'POST':
+        opcao.delete()
+        messages.success(request, 'Opção apagada com sucesso!')
+        return redirect('cursos:gerir_opcoes_pergunta', pk_pergunta=pergunta.pk)
+
+    context = {
+        'opcao': opcao,
+        'pergunta': pergunta,
+    }
+    return render(request, 'cursos/apagar_opcao_resposta.html', context=context)

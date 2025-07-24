@@ -23,7 +23,10 @@ from .views import (
     detalhe_topico,
     inscrever_curso,
     gerir_quiz_curso,
-    gerir_pergunta_quiz,
+    pergunta_quiz_form,
+    gerir_opcoes_pergunta,
+    editar_opcao_resposta,
+    apagar_opcao_resposta,
 )
 
 app_name = 'cursos'
@@ -58,8 +61,11 @@ urlpatterns = [
     path('meu-painel-instrutor/categorias/<int:pk_categoria>/apagar/', apagar_categoria, name='apagar_categoria'),
 
     path('meu-painel-instrutor/cursos/<int:pk_curso>/quiz/', gerir_quiz_curso, name='gerir_quiz_curso'),
-    path('meu-painel-instrutor/cursos/<int:pk_curso>/quiz/perguntas/nova/', gerir_pergunta_quiz, name='adicionar_pergunta_quiz'),
-    path('meu-painel-instrutor/cursos/<int:pk_curso>/quiz/perguntas/<int:pk_pergunta>/editar/', gerir_pergunta_quiz, name='editar_pergunta_quiz'),
+    path('meu-painel-instrutor/cursos/<int:pk_curso>/quiz/perguntas/nova/', pergunta_quiz_form, name='adicionar_pergunta_quiz'),
+    path('meu-painel-instrutor/cursos/<int:pk_curso>/quiz/perguntas/<int:pk_pergunta>/editar/', pergunta_quiz_form, name='editar_pergunta_quiz'),
+    path('meu-painel-instrutor/quiz/perguntas/<int:pk_pergunta>/opcoes/', gerir_opcoes_pergunta, name='gerir_opcoes_pergunta'),
+    path('meu-painel-instrutor/opcoes/<int:pk_opcao>/editar/', editar_opcao_resposta, name='editar_opcao_resposta'),
+    path('meu-painel-instrutor/opcoes/<int:pk_opcao>/apagar/', apagar_opcao_resposta, name='apagar_opcao_resposta'),
 
     path('comunidade/', lista_topicos, name='lista_topicos'),
     path('comunidade/topico/<int:pk_topico>/', detalhe_topico, name='detalhe_topico'),
