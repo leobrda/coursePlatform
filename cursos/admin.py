@@ -2,7 +2,7 @@ from django import forms
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
-from .models import Associado, Curso, Aula, Pergunta, Resposta, Categoria, Organizacao
+from .models import Associado, Curso, Aula, Pergunta, Resposta, Categoria, Organizacao, Quiz, PerguntaQuiz, OpcaoResposta, ResultadoQuiz
 from urllib.parse import urlparse, parse_qs
 
 
@@ -113,3 +113,31 @@ class CategoriaAdmin(admin.ModelAdmin):
 class OrganizacaoAdmin(admin.ModelAdmin):
     list_display = ('nome', 'dono')
 
+
+class OpcaoRespostaInline(admin.TabularInline):
+    model = OpcaoResposta
+    extra = 4
+    max_num = 4
+
+
+@admin.register(PerguntaQuiz)
+class PerguntaQuizAdmin(admin.ModelAdmin):
+    list_display = ('texto', 'quiz')
+    inlines = [OpcaoRespostaInline]
+
+
+class PerguntaQuizInline(admin.StackedInline):
+    model = PerguntaQuiz
+    extra = 1
+
+
+@admin.register(Quiz)
+class QuizAdmin(admin.ModelAdmin):
+    list_display = ('titulo', 'curso')
+    inlines = [PerguntaQuizInline]
+
+
+@admin.register(ResultadoQuiz)
+class ResultadoQuizAdmin(admin.ModelAdmin):
+    list_display = ('associado', 'quiz', 'pontuacao', 'data_realizacao')
+    readonly_fields = ('associado', 'quiz', 'pontuacao', 'data_realizacao')

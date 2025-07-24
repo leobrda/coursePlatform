@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Gerir Opções - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h1 class="h4 mb-0">Gerir Opções de Resposta</h1>
+            <p class="text-muted mb-0 small">Pergunta: "{{ pergunta.texto }}"</p>
+        </div>
+        <div class="card-body">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            <div class="row">
+                <!-- Coluna para Adicionar Opção -->
+                <div class="col-md-5 mb-4">
+                    <h2 class="h5">Adicionar Nova Opção</h2>
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <button type="submit" class="btn btn-primary w-100">Adicionar Opção</button>
+                    </form>
+                </div>
+                <!-- Coluna para Listar Opções -->
+                <div class="col-md-7">
+                    <h2 class="h5">Opções Existentes</h2>
+                    {% if opcoes %}
+                        <ul class="list-group">
+                            {% for opcao in opcoes %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center {% if opcao.correta %}list-group-item-success{% endif %}">
+                                    <span>
+                                        {{ opcao.texto }}
+                                        {% if opcao.correta %}
+                                            <span class="badge bg-success ms-2">Correta</span>
+                                        {% endif %}
+                                    </span>
+                                    <div>
+                                        <a href="{% url 'cursos:editar_opcao_resposta' pk_opcao=opcao.pk %}" class="btn btn-outline-secondary btn-sm">Editar</a>
+                                        <a href="{% url 'cursos:apagar_opcao_resposta' pk_opcao=opcao.pk %}" class="btn btn-outline-danger btn-sm">Apagar</a>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted">Nenhuma opção adicionada ainda.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mt-4">
+        <a href="{% url 'cursos:gerir_quiz_curso' pk_curso=pergunta.quiz.curso.pk %}" class="text-decoration-none">&larr; Voltar para a Gestão do Quiz</a>
+    </div>
+</div>
+{% endblock %}

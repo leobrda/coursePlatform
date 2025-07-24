@@ -83,6 +83,7 @@
                                     <div>
                                         <a href="{% url 'cursos:editar_curso' pk=curso.pk %}" class="btn btn-outline-secondary btn-sm">Detalhes</a>
                                         <a href="{% url 'cursos:gerir_aulas' pk_curso=curso.pk %}" class="btn btn-outline-info btn-sm">Aulas</a>
+                                        <a href="{% url 'cursos:gerir_quiz_curso' pk_curso=curso.pk %}" class="btn btn-quiz text-black btn-sm">Quiz</a>
                                     </div>
                                 </li>
                             {% endfor %}

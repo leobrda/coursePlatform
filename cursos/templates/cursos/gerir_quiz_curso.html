@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Gerir Quiz: {{ curso.titulo }} - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h1 class="h4 mb-0">Gerir Quiz do Curso: "{{ curso.titulo }}"</h1>
+        </div>
+        <div class="card-body">
+            {% if quiz %}
+                <!-- Se o quiz já existe, mostramos as perguntas -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="h5">Perguntas da Avaliação</h2>
+                    <a href="{% url 'cursos:adicionar_pergunta_quiz' pk_curso=curso.pk %}" class="btn btn-primary">Adicionar Pergunta</a>
+                </div>
+
+                {% if quiz.perguntas.all %}
+                    <ul class="list-group">
+                        {% for pergunta in quiz.perguntas.all %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ pergunta.texto|truncatewords:15 }}
+                                <div>
+                                    <a href="{% url 'cursos:gerir_opcoes_pergunta' pk_pergunta=pergunta.pk %}" class="btn btn-info btn-sm text-white">Gerir Opções</a>
+                                    <a href="{% url 'cursos:editar_pergunta_quiz' pk_curso=curso.pk pk_pergunta=pergunta.pk %}" class="btn btn-outline-secondary btn-sm">Editar Enunciado</a>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted">Ainda não há perguntas neste quiz. Comece por adicionar uma!</p>
+                {% endif %}
+
+            {% else %}
+                <!-- Se o quiz não existe, mostramos o botão para o criar -->
+                <div class="text-center p-4">
+                    <p class="lead">Este curso ainda não tem uma avaliação.</p>
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success btn-lg">Criar Quiz para este Curso</button>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="mt-4">
+        <a href="{% url 'cursos:painel_instrutor' %}" class="text-decoration-none">&larr; Voltar para o Painel</a>
+    </div>
+</div>
+{% endblock %}

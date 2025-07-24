@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Confirmar Exclusão - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow-sm text-center">
+                <div class="card-header">
+                    <h1 class="h4 mb-0 text-danger">Tem a certeza?</h1>
+                </div>
+                <div class="card-body">
+                    <p class="lead">Você está prestes a apagar permanentemente a opção:</p>
+                    <h2 class="h3 my-3">"{{ opcao.texto }}"</h2>
+                    <p class="text-muted">Esta ação não pode ser desfeita.</p>
+                    <form method="post" class="mt-4">
+                        {% csrf_token %}
+                        <a href="{% url 'cursos:gerir_opcoes_pergunta' pk_pergunta=pergunta.pk %}" class="btn btn-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-danger">Sim, apagar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
++

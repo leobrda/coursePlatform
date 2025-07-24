@@ -171,3 +171,41 @@ class ComentarioTopico(models.Model):
 
     def __str__(self):
         return f'Comentário de {self.autor.username} em "{self.topico.titulo}"'
+
+
+class Quiz(models.Model):
+    curso = models.OneToOneField(Curso, on_delete=models.CASCADE, related_name='quiz')
+    titulo = models.CharField(max_length=255, verbose_name='Título do Quiz')
+
+    class Meta:
+        verbose_name_plural = 'Quizzes'
+
+    def __str__(self):
+        return f'Quiz do curso: {self.curso.titulo}'
+
+
+class PerguntaQuiz(models.Model):
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='perguntas')
+    texto = models.TextField(verbose_name='Texto da Pergunta')
+
+    def __str__(self):
+        return self.texto
+
+
+class OpcaoResposta(models.Model):
+    pergunta = models.ForeignKey(PerguntaQuiz, on_delete=models.CASCADE, related_name='opcoes')
+    texto = models.CharField(max_length=600, verbose_name='Texto da Opção')
+    correta = models.BooleanField(default=False, verbose_name='É a resposta correta?')
+
+    def __str__(self):
+        return f'Opção para: {self.pergunta.text[:30]}...'
+
+
+class ResultadoQuiz(models.Model):
+    associado = models.ForeignKey(Associado, on_delete=models.CASCADE, related_name='resultado_quiz')
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    pontuacao = models.FloatField()
+    data_realizacao = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Resultado de {self.associado.usuario.username} no {self.quiz.titulo}'
