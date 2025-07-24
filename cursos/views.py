@@ -5,7 +5,7 @@ from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.http import Http404, HttpResponseForbidden
-from .models import Curso, Aula, Pergunta, Resposta, Associado, Categoria, Notificacao, Organizacao, TopicoDiscussao, ComentarioTopico, Quiz, PerguntaQuiz, OpcaoResposta
+from .models import Curso, Aula, Pergunta, Resposta, Associado, Categoria, Notificacao, Organizacao, TopicoDiscussao, ComentarioTopico, Quiz, PerguntaQuiz, OpcaoResposta, ResultadoQuiz
 
 
 def get_user_organization(request):
@@ -629,3 +629,54 @@ def apagar_opcao_resposta(request, pk_opcao):
         'pergunta': pergunta,
     }
     return render(request, 'cursos/apagar_opcao_resposta.html', context=context)
+
+
+@login_required
+def fazer_quiz(request, pk_curso):
+    curso = get_object_or_404(Curso, pk=pk_curso)
+    quiz = get_object_or_404(Quiz, curso=curso)
+    associado = get_object_or_404(Associado, usuario=request.user)
+    aulas_do_curso = curso.aulas.all()
+    aulas_concluidas_do_curso = associado.aulas_concluidas.filter(curso=curso)
+
+    if aulas_do_curso.count() != aulas_concluidas_do_curso.count():
+        return HttpResponseForbidden('Você precisa concluir todas as aulas antes de fazer a avaliação.')
+
+    context = {
+        'quiz': quiz,
+    }
+
+
+@login_required
+def submeter_quiz(request, pk_quiz):
+    quiz = get_object_or_404(Quiz, pk=pk_quiz)
+    associado = get_object_or_404(Associado, usuario=request.user)
+
+    if request.method == 'POST':
+        respostas_corretas = 0
+        total_perguntas = quiz.perguntas.count()
+
+        for pergunta in quiz.perguntas.all():
+            id_opcao_selecionada = request.POST.get(f'pergunta_{pergunta.id}')
+            if id_opcao_selecionada:
+                try:
+                    opcao_selecionada = pergunta.opcoes.get(pk=id_opcao_selecionada)
+                    if opcao_selecionada.correta:
+                        respostas_corretas += 1
+                except OpcaoResposta.DoesNotExist:
+                    pass
+
+        pontuacao = (respostas_corretas / total_perguntas) * 100 if total_perguntas > 0 else 0
+
+        resultado, created = ResultadoQuiz.objects.update_or_create(
+            associado=associado,
+            quiz=quiz,
+            defaults={'pontuacao': pontuacao}
+        )
+
+        contexto = {
+            'resultado': resultado,
+        }
+        return render(request, 'cursos/resultado_quiz.html', contexto)
+
+    return redirect('cursos:detalhe_curso', pk=quiz.curso.pk)

@@ -27,6 +27,8 @@ from .views import (
     gerir_opcoes_pergunta,
     editar_opcao_resposta,
     apagar_opcao_resposta,
+    fazer_quiz,
+    submeter_quiz,
 )
 
 app_name = 'cursos'
@@ -66,6 +68,9 @@ urlpatterns = [
     path('meu-painel-instrutor/quiz/perguntas/<int:pk_pergunta>/opcoes/', gerir_opcoes_pergunta, name='gerir_opcoes_pergunta'),
     path('meu-painel-instrutor/opcoes/<int:pk_opcao>/editar/', editar_opcao_resposta, name='editar_opcao_resposta'),
     path('meu-painel-instrutor/opcoes/<int:pk_opcao>/apagar/', apagar_opcao_resposta, name='apagar_opcao_resposta'),
+
+    path('curso/<int:pk_curso>/fazer-quiz/', fazer_quiz, name='fazer_quiz'),
+    path('quiz/<int:pk_quiz>/submeter/', submeter_quiz, name='submeter_quiz'),
 
     path('comunidade/', lista_topicos, name='lista_topicos'),
     path('comunidade/topico/<int:pk_topico>/', detalhe_topico, name='detalhe_topico'),
