@@ -79,8 +79,16 @@ def detalhe_curso(request, pk):
 
     curso = get_object_or_404(Curso, pk=pk, organizacao=organizacao_usuario)
 
+    aulas_do_curso_count = curso.aulas.count()
+    aulas_concluidas_count = 0
+    if request.user.is_authenticated and hasattr(request.user, 'associado'):
+        associado = request.user.associado
+        aulas_concluidas_count = associado.aulas_concluidas.filter(curso=curso).count()
+
     context = {
         'curso': curso,
+        'aulas_do_curso_count': aulas_do_curso_count,
+        'aulas_concluidas_count': aulas_concluidas_count,
     }
 
     return render(request, 'cursos/detalhe_curso.html', context=context)
@@ -636,15 +644,17 @@ def fazer_quiz(request, pk_curso):
     curso = get_object_or_404(Curso, pk=pk_curso)
     quiz = get_object_or_404(Quiz, curso=curso)
     associado = get_object_or_404(Associado, usuario=request.user)
-    aulas_do_curso = curso.aulas.all()
-    aulas_concluidas_do_curso = associado.aulas_concluidas.filter(curso=curso)
+    aulas_do_curso_count = curso.aulas.count()
+    aulas_concluidas_count = associado.aulas_concluidas.filter(curso=curso).count()
 
-    if aulas_do_curso.count() != aulas_concluidas_do_curso.count():
-        return HttpResponseForbidden('Você precisa concluir todas as aulas antes de fazer a avaliação.')
+    if aulas_do_curso_count == 0 or aulas_do_curso_count != aulas_concluidas_count:
+        return HttpResponseForbidden('Você precisa de concluir todas as aulas antes de fazer a avaliação.')
 
     context = {
         'quiz': quiz,
     }
+
+    return render(request, 'cursos/fazer_quiz.html', context=context)
 
 
 @login_required
