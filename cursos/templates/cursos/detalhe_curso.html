@@ -64,6 +64,22 @@
                 </div>
             </div>
 
+            {% if user.is_authenticated and user.associado and curso in user.associado.cursos_inscritos.all and curso.quiz %}
+                <div class="card shadow-sm mt-4">
+                    <div class="card-header">
+                        <h2 class="h4 mb-0">Avaliação Final</h2>
+                    </div>
+                    <div class="card-body text-center p-4">
+                        {% if aulas_do_curso_count > 0 and aulas_do_curso_count == aulas_concluidas_count %}
+                            <p class="lead">Parabéns! Você concluiu todas as aulas deste curso.</p>
+                            <a href="{% url 'cursos:fazer_quiz' pk_curso=curso.pk %}" class="btn btn-success btn-lg">Fazer a Avaliação Final</a>
+                        {% else %}
+                            <p class="text-muted">Você precisa de concluir todas as {{ aulas_do_curso_count }} aulas do curso para desbloquear a avaliação final. Você já completou {{ aulas_concluidas_count }}.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+
         </div>
     </div>
 </div>

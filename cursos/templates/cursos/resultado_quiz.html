@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Resultado da Avaliação - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow-sm text-center">
+                <div class="card-header">
+                    <h1 class="h4 mb-0">Resultado da Avaliação</h1>
+                    <p class="text-muted mb-0 small">Curso: {{ resultado.quiz.curso.titulo }}</p>
+                </div>
+                <div class="card-body p-5">
+                    <h2 class="h5">A sua pontuação foi:</h2>
+                    <p class="display-1 fw-bold
+                        {% if resultado.pontuacao >= 70 %}text-success{% else %}text-danger{% endif %}">
+                        {{ resultado.pontuacao|floatformat:0 }}%
+                    </p>
+                    {% if resultado.pontuacao >= 70 %}
+                        <p class="lead">Parabéns, você foi aprovado!</p>
+                        <!-- Futuramente, o botão para gerar o certificado pode aparecer aqui -->
+                    {% else %}
+                        <p class="lead">Infelizmente, você não atingiu a pontuação mínima. Estude mais um pouco e tente novamente!</p>
+                        <a href="{% url 'cursos:fazer_quiz' pk_curso=resultado.quiz.curso.pk %}" class="btn btn-secondary mt-3">Tentar Novamente</a>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'cursos:detalhe_curso' pk=resultado.quiz.curso.pk %}">Voltar para a página do curso</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
