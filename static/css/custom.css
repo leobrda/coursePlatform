@@ -1,0 +1,35 @@
+/* Importar a fonte Poppins do Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+/* Definir as nossas novas cores e a fonte principal */
+:root {
+    --bs-font-sans-serif: 'Poppins', sans-serif;
+    --bs-primary: #4A69BD; /* Azul-Ardósia */
+    --bs-secondary: #6c757d; /* Cinza Padrão */
+    --bs-success: #1ABC9C; /* Verde-Azulado */
+    --bs-info: #3498DB;
+    --bs-warning: #F1C40F; /* Âmbar */
+    --bs-danger: #E74C3C;
+    --bs-light: #f8f9fa;
+    --bs-dark: #212529; /* Cinza-Escuro/Carvão */
+}
+
+/* Pequenos ajustes para melhorar a aparência */
+body {
+    font-family: var(--bs-font-sans-serif);
+    background-color: #f0f2f5; /* Um fundo um pouco mais escuro para contraste */
+}
+
+.card {
+    border: none; /* Remove as bordas dos cartões para um look mais moderno */
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+}
+
+.btn {
+    font-weight: 600;
+}

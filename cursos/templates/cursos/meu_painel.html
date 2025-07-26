@@ -1,8 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}
-    Meu Painel - {{ block.super }}
-{% endblock %}
+{% block title %}Meu Painel - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="container my-5">
@@ -27,38 +25,39 @@
             </ul>
         </div>
         <div class="card-body">
-            <div class="tab-content" id="myTabContent">
+            <div class="tab-content p-3" id="myTabContent">
 
                 <!-- Aba 1: Editar Perfil -->
                 <div class="tab-pane fade show active" id="perfil" role="tabpanel" aria-labelledby="perfil-tab">
-                    <h2 class="h4 mb-3">Editar Perfil</h2>
-
-                    <div class="text-center mb-4">
-                        {% if user.associado.foto_perfil %}
-                            <img src="{{ user.associado.foto_perfil.url }}" class="rounded-circle" alt="Foto de Perfil" width="150" height="150" style="object-fit: cover;">
-                        {% else %}
-                            <img src="https://placehold.co/150x150/EBF0F8/7F9CF5?text={{ user.first_name|first }}" class="rounded-circle" alt="Avatar Padrão">
-                        {% endif %}
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            {% if user.associado.foto_perfil %}
+                                <img src="{{ user.associado.foto_perfil.url }}" class="img-fluid rounded-circle mb-3" alt="Foto de Perfil" style="width: 150px; height: 150px; object-fit: cover;">
+                            {% else %}
+                                <img src="https://placehold.co/150x150/4A69BD/FFFFFF?text={{ user.first_name|first }}" class="img-fluid rounded-circle mb-3" alt="Avatar Padrão">
+                            {% endif %}
+                        </div>
+                        <div class="col-md-8">
+                            <h2 class="h4 mb-3">Editar Perfil</h2>
+                            {% if messages %}
+                                {% for message in messages %}
+                                    <div class="alert alert-success" role="alert">
+                                        {{ message }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                            <form method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                {% for field in form %}
+                                    <div class="mb-3">
+                                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                        {{ field }}
+                                    </div>
+                                {% endfor %}
+                                <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                            </form>
+                        </div>
                     </div>
-
-                    {% if messages %}
-                        {% for message in messages %}
-                            <div class="alert alert-success" role="alert">
-                                {{ message }}
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-
-                    <form method="post" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        {% for field in form %}
-                            <div class="mb-3">
-                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                                {{ field }}
-                            </div>
-                        {% endfor %}
-                        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
-                    </form>
                 </div>
 
                 <!-- Aba 2: Meus Cursos -->
@@ -66,8 +65,9 @@
                     <h2 class="h4 mb-3">Cursos em que estou Inscrito</h2>
                     <ul class="list-group">
                         {% for curso in meus_cursos %}
-                            <li class="list-group-item">
-                                <a href="{% url 'cursos:detalhe_curso' pk=curso.pk %}">{{ curso.titulo }}</a>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ curso.titulo }}
+                                <a href="{% url 'cursos:detalhe_curso' pk=curso.pk %}" class="btn btn-sm btn-outline-primary">Ver Curso</a>
                             </li>
                         {% empty %}
                             <li class="list-group-item text-muted">Você ainda não está inscrito em nenhum curso.</li>
@@ -84,7 +84,7 @@
                                 <a href="{% url 'cursos:ver_aula' pk=pergunta.aula.pk %}">
                                     "{{ pergunta.conteudo|truncatewords:15 }}"
                                 </a>
-                                <div class="small text-muted">Na aula: {{ pergunta.aula.titulo }}</div>
+                                <div class="small text-muted mt-1">Na aula: {{ pergunta.aula.titulo }}</div>
                             </li>
                         {% empty %}
                             <li class="list-group-item text-muted">Você ainda não fez nenhuma pergunta.</li>
@@ -101,7 +101,7 @@
                                 <a href="{% url 'cursos:ver_aula' pk=resposta.pergunta.aula.pk %}">
                                     "{{ resposta.conteudo|truncatewords:15 }}"
                                 </a>
-                                <div class="small text-muted">Respondendo na aula: {{ resposta.pergunta.aula.titulo }}</div>
+                                <div class="small text-muted mt-1">Respondendo na aula: {{ resposta.pergunta.aula.titulo }}</div>
                             </li>
                         {% empty %}
                             <li class="list-group-item text-muted">Você ainda não deu nenhuma resposta.</li>

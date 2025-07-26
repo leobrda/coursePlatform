@@ -1,8 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}
-    Painel do Instrutor - {{ block.super }}
-{% endblock %}
+{% block title %}Painel do Instrutor - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="container my-5">
@@ -44,7 +42,7 @@
         <!-- Aprovar Associados -->
         <div class="col-12 mb-4">
             <div class="card shadow-sm">
-                <div class="card-header">
+                <div class="card-header bg-white">
                     <h2 class="h5 mb-0">Aprovar Novos Associados</h2>
                 </div>
                 <div class="card-body">
@@ -70,7 +68,7 @@
         <!-- Gerir Cursos -->
         <div class="col-lg-6 mb-4">
             <div class="card shadow-sm h-100">
-                <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
                     <h2 class="h5 mb-0">Meus Cursos</h2>
                     <a href="{% url 'cursos:criar_curso' %}" class="btn btn-primary btn-sm">Adicionar Curso</a>
                 </div>
@@ -83,7 +81,7 @@
                                     <div>
                                         <a href="{% url 'cursos:editar_curso' pk=curso.pk %}" class="btn btn-outline-secondary btn-sm">Detalhes</a>
                                         <a href="{% url 'cursos:gerir_aulas' pk_curso=curso.pk %}" class="btn btn-outline-info btn-sm">Aulas</a>
-                                        <a href="{% url 'cursos:gerir_quiz_curso' pk_curso=curso.pk %}" class="btn btn-quiz text-black btn-sm">Quiz</a>
+                                        <a href="{% url 'cursos:gerir_quiz_curso' pk_curso=curso.pk %}" class="btn btn-outline-info btn-sm">Quiz</a>
                                     </div>
                                 </li>
                             {% endfor %}
@@ -98,7 +96,7 @@
         <!-- Gerir Categorias -->
         <div class="col-lg-6 mb-4">
             <div class="card shadow-sm h-100">
-                <div class="card-header">
+                <div class="card-header bg-white">
                     <h2 class="h5 mb-0">Minhas Categorias</h2>
                 </div>
                 <div class="card-body">

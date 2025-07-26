@@ -1,17 +1,15 @@
 {% extends 'base.html' %}
 
-{% block title %}
-    {{ aula.titulo }} - {{ block.super }}
-{% endblock %}
+{% block title %}{{ aula.titulo }} - {{ block.super }}{% endblock %}
 
 {% block content %}
-<div class="container my-5">
+<div class="container-fluid px-lg-5 my-4">
     <div class="row">
         <!-- Conteúdo Principal: Vídeo e Detalhes -->
         <div class="col-lg-8">
             <!-- Título da Aula e Navegação -->
             <div class="mb-4">
-                <a href="{% url 'cursos:detalhe_curso' pk=aula.curso.pk %}" class="text-decoration-none">&larr; Voltar para o Curso</a>
+                <a href="{% url 'cursos:detalhe_curso' pk=aula.curso.pk %}" class="text-decoration-none fw-bold">&larr; Voltar para o Curso</a>
                 <h1 class="display-5 mt-2">{{ aula.titulo }}</h1>
             </div>
 
@@ -20,18 +18,18 @@
                 {% if aula.youtube_video_id %}
                     <iframe src="https://www.youtube.com/embed/{{ aula.youtube_video_id }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 {% else %}
-                    <div class="bg-dark d-flex justify-content-center align-items-center text-white">
+                    <div class="bg-dark d-flex justify-content-center align-items-center text-white rounded">
                         <p class="mb-0">ID do vídeo inválido.</p>
                     </div>
                 {% endif %}
             </div>
 
             <!-- Descrição e Ações -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <p class="card-text">{{ aula.descricao|linebreaks }}</p>
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <p class="card-text fs-5">{{ aula.descricao|linebreaks }}</p>
                     <hr>
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                         {% if user.is_authenticated and user.associado %}
                             {% if aula in user.associado.aulas_concluidas.all %}
                                 <a href="{% url 'cursos:marcar_aula_concluida' pk_aula=aula.pk %}" class="btn btn-success">✔ Aula Concluída</a>
@@ -50,7 +48,7 @@
         <!-- Barra Lateral: Perguntas e Respostas -->
         <div class="col-lg-4">
             <div class="card shadow-sm">
-                <div class="card-header">
+                <div class="card-header bg-white">
                     <h2 class="h5 mb-0">Perguntas e Discussões</h2>
                 </div>
                 <div class="card-body">
@@ -58,7 +56,7 @@
                     <form method="post" action="{% url 'cursos:ver_aula' pk=aula.pk %}">
                         {% csrf_token %}
                         <div class="mb-3">
-                            <label for="{{ form_pergunta.conteudo.id_for_label }}" class="form-label">Faça uma pergunta:</label>
+                            <label for="{{ form_pergunta.conteudo.id_for_label }}" class="form-label fw-bold">Faça uma pergunta:</label>
                             {{ form_pergunta.conteudo }}
                         </div>
                         <button type="submit" name="submit_pergunta" class="btn btn-primary w-100">Enviar Pergunta</button>
