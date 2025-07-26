@@ -1,8 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}
-    {{ curso.titulo }} - {{ block.super }}
-{% endblock %}
+{% block title %}{{ curso.titulo }} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="container my-5">
@@ -13,7 +11,7 @@
                 <div class="card-body p-4">
                     <div class="row align-items-center">
                         <div class="col-md-4">
-                            <img src="{% if curso.imagem_capa %}{{ curso.imagem_capa.url }}{% else %}https://placehold.co/600x400/007BFF/FFFFFF?text=Curso{% endif %}" class="img-fluid rounded" alt="Capa do curso {{ curso.titulo }}">
+                            <img src="{% if curso.imagem_capa %}{{ curso.imagem_capa.url }}{% else %}https://placehold.co/600x400/4A69BD/FFFFFF?text=Curso{% endif %}" class="img-fluid rounded" alt="Capa do curso {{ curso.titulo }}">
                         </div>
                         <div class="col-md-8">
                             <h1 class="display-5">{{ curso.titulo }}</h1>
@@ -35,38 +33,39 @@
             </div>
 
             <!-- Lista de Aulas -->
-            <div class="card shadow-sm">
-                <div class="card-header">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
                     <h2 class="h4 mb-0">Conteúdo do Curso</h2>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-0">
                     {% if user.is_authenticated and user.associado and curso in user.associado.cursos_inscritos.all %}
                         <ul class="list-group list-group-flush">
                             {% for aula in curso.aulas.all %}
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
                                     <div class="d-flex align-items-center">
                                         {% if aula in user.associado.aulas_concluidas.all %}
-                                            <span class="badge bg-success me-3">✔</span>
+                                            <span class="badge bg-success me-3 fs-6">✔</span>
                                         {% else %}
-                                            <span class="badge bg-light text-dark me-3">{{ aula.ordem }}</span>
+                                            <span class="badge bg-light text-dark me-3 fs-6">{{ aula.ordem }}</span>
                                         {% endif %}
-                                        {{ aula.titulo }}
+                                        <span class="fw-500">{{ aula.titulo }}</span>
                                     </div>
                                     <a href="{% url 'cursos:ver_aula' pk=aula.pk %}" class="btn btn-primary btn-sm">Assistir Aula</a>
                                 </li>
                             {% empty %}
-                                <li class="list-group-item">Nenhuma aula cadastrada para este curso ainda.</li>
+                                <li class="list-group-item text-muted">Nenhuma aula cadastrada para este curso ainda.</li>
                             {% endfor %}
                         </ul>
                     {% else %}
-                        <p class="text-center text-muted p-3">Você precisa de se inscrever neste curso para ver as aulas.</p>
+                        <p class="text-center text-muted p-4 mb-0">Você precisa de se inscrever neste curso para ver as aulas.</p>
                     {% endif %}
                 </div>
             </div>
 
+            <!-- Secção da Avaliação Final -->
             {% if user.is_authenticated and user.associado and curso in user.associado.cursos_inscritos.all and curso.quiz %}
-                <div class="card shadow-sm mt-4">
-                    <div class="card-header">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
                         <h2 class="h4 mb-0">Avaliação Final</h2>
                     </div>
                     <div class="card-body text-center p-4">

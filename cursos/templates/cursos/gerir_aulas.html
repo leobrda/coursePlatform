@@ -1,27 +1,25 @@
 {% extends 'base.html' %}
 
-{% block title %}
-    Gerir Aulas: {{ curso.titulo }} - {{ block.super }}
-{% endblock %}
+{% block title %}Gerir Aulas: {{ curso.titulo }} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="container my-5">
     <div class="card shadow-sm">
-        <div class="card-header d-flex justify-content-between align-items-center">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
             <div>
                 <h1 class="h4 mb-0">Gerir Aulas</h1>
                 <p class="text-muted mb-0 small">Curso: {{ curso.titulo }}</p>
             </div>
             <a href="{% url 'cursos:adicionar_aula' pk_curso=curso.pk %}" class="btn btn-primary">Adicionar Nova Aula</a>
         </div>
-        <div class="card-body">
+        <div class="card-body p-0">
             {% if aulas %}
                 <div class="list-group list-group-flush">
                     {% for aula in aulas %}
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div class="list-group-item d-flex justify-content-between align-items-center p-3">
                             <div>
                                 <span class="badge bg-secondary me-2">#{{ aula.ordem }}</span>
-                                <span class="fw-500">{{ aula.titulo }}</span>
+                                <span class="fw-bold">{{ aula.titulo }}</span>
                             </div>
                             <div>
                                 <a href="{% url 'cursos:editar_aula' pk_curso=curso.pk pk_aula=aula.pk %}" class="btn btn-outline-secondary btn-sm">Editar</a>
@@ -31,12 +29,12 @@
                     {% endfor %}
                 </div>
             {% else %}
-                <p class="text-center text-muted p-3">Ainda não há aulas para este curso. Comece por adicionar uma!</p>
+                <p class="text-center text-muted p-4">Ainda não há aulas para este curso. Comece por adicionar uma!</p>
             {% endif %}
         </div>
     </div>
     <div class="mt-4">
-        <a href="{% url 'cursos:painel_instrutor' %}" class="text-decoration-none">&larr; Voltar para o Painel do Instrutor</a>
+        <a href="{% url 'cursos:painel_instrutor' %}" class="text-decoration-none fw-bold">&larr; Voltar para o Painel do Instrutor</a>
     </div>
 </div>
 {% endblock %}
