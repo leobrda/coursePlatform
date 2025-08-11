@@ -5,59 +5,66 @@
 {% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <div class="card shadow-sm">
-        <div class="card-header">
-            <h1 class="h4 mb-0">Gerir Opções de Resposta</h1>
-            <p class="text-muted mb-0 small">Pergunta: "{{ pergunta.texto }}"</p>
+<div class="container mx-auto my-8 px-4">
+    <div class="bg-white rounded-lg shadow-md">
+        <div class="p-6 border-b">
+            <h1 class="text-2xl font-semibold">Gerir Opções de Resposta</h1>
+            <p class="text-sm text-gray-500 mt-1">Pergunta: "{{ pergunta.texto }}"</p>
         </div>
-        <div class="card-body">
+        <div class="p-6">
             {% if messages %}
                 {% for message in messages %}
-                    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}" role="alert">
+                    <div class="mb-4 p-4 rounded-md {% if message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}" role="alert">
                         {{ message }}
                     </div>
                 {% endfor %}
             {% endif %}
-            <div class="row">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <!-- Coluna para Adicionar Opção -->
-                <div class="col-md-5 mb-4">
-                    <h2 class="h5">Adicionar Nova Opção</h2>
-                    <form method="post">
+                <div>
+                    <h2 class="text-xl font-semibold mb-4">Adicionar Nova Opção</h2>
+                    <form method="post" class="space-y-4">
                         {% csrf_token %}
-                        {{ form.as_p }}
-                        <button type="submit" class="btn btn-primary w-100">Adicionar Opção</button>
+                        {% for field in form %}
+                            <div>
+                                <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ field.label }}</label>
+                                <div class="mt-1">
+                                    {{ field }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                        <button type="submit" class="w-full bg-primary text-white font-semibold py-2 px-4 rounded-md hover:bg-opacity-90 transition-colors">Adicionar Opção</button>
                     </form>
                 </div>
                 <!-- Coluna para Listar Opções -->
-                <div class="col-md-7">
-                    <h2 class="h5">Opções Existentes</h2>
+                <div>
+                    <h2 class="text-xl font-semibold mb-4">Opções Existentes</h2>
                     {% if opcoes %}
-                        <ul class="list-group">
+                        <ul class="divide-y divide-gray-200 border rounded-md">
                             {% for opcao in opcoes %}
-                                <li class="list-group-item d-flex justify-content-between align-items-center {% if opcao.correta %}list-group-item-success{% endif %}">
-                                    <span>
-                                        {{ opcao.texto }}
+                                <li class="p-3 flex justify-between items-center {% if opcao.correta %}bg-green-50{% endif %}">
+                                    <span class="text-gray-800">{{ opcao.texto }}</span>
+                                    <div class="flex items-center space-x-2">
                                         {% if opcao.correta %}
-                                            <span class="badge bg-success ms-2">Correta</span>
+                                            <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-green-600 bg-green-200">
+                                                Correta
+                                            </span>
                                         {% endif %}
-                                    </span>
-                                    <div>
-                                        <a href="{% url 'cursos:editar_opcao_resposta' pk_opcao=opcao.pk %}" class="btn btn-outline-secondary btn-sm">Editar</a>
-                                        <a href="{% url 'cursos:apagar_opcao_resposta' pk_opcao=opcao.pk %}" class="btn btn-outline-danger btn-sm">Apagar</a>
+                                        <a href="{% url 'cursos:editar_opcao_resposta' pk_opcao=opcao.pk %}" class="text-sm bg-gray-200 text-gray-700 font-semibold py-1 px-2 rounded-md hover:bg-gray-300 transition-colors">Editar</a>
+                                        <a href="{% url 'cursos:apagar_opcao_resposta' pk_opcao=opcao.pk %}" class="text-sm bg-danger text-white font-semibold py-1 px-2 rounded-md hover:bg-opacity-90 transition-colors">Apagar</a>
                                     </div>
                                 </li>
                             {% endfor %}
                         </ul>
                     {% else %}
-                        <p class="text-muted">Nenhuma opção adicionada ainda.</p>
+                        <p class="text-center text-gray-500 py-6">Nenhuma opção adicionada ainda.</p>
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
-    <div class="mt-4">
-        <a href="{% url 'cursos:gerir_quiz_curso' pk_curso=pergunta.quiz.curso.pk %}" class="text-decoration-none">&larr; Voltar para a Gestão do Quiz</a>
+    <div class="mt-6">
+        <a href="{% url 'cursos:gerir_quiz_curso' pk_curso=pergunta.quiz.curso.pk %}" class="font-semibold text-primary hover:underline">&larr; Voltar para a Gestão do Quiz</a>
     </div>
 </div>
 {% endblock %}

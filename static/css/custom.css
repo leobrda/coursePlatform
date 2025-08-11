@@ -1,35 +1,349 @@
 /* Importar a fonte Poppins do Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap");
 
-/* Definir as nossas novas cores e a fonte principal */
+/* Configuração do Tailwind CSS com nossas cores personalizadas */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definir as variáveis CSS customizadas para um tema legal-tech */
 :root {
-    --bs-font-sans-serif: 'Poppins', sans-serif;
-    --bs-primary: #4A69BD; /* Azul-Ardósia */
-    --bs-secondary: #6c757d; /* Cinza Padrão */
-    --bs-success: #1ABC9C; /* Verde-Azulado */
-    --bs-info: #3498DB;
-    --bs-warning: #F1C40F; /* Âmbar */
-    --bs-danger: #E74C3C;
-    --bs-light: #f8f9fa;
-    --bs-dark: #212529; /* Cinza-Escuro/Carvão */
+  /* Cores principais - Neutras e Sóbrias */
+  --primary-navy: #0a1128; /* Azul Marinho Profundo */
+  --primary-blue: #122a57; /* Azul Escuro */
+  --primary-gray: #2d3748; /* Cinza Chumbo */
+  --primary-light-gray: #cbd5e0; /* Cinza Claro */
+  --primary-white: #f8f9fa; /* Branco Quente */
+  --primary-black: #000000; /* Preto Puro */
+  --primary-brown: #4a3728; /* Marrom Escuro para estabilidade */
+
+  /* Cores de destaque - Sutis e Profissionais */
+  --accent-gold: #b8860b; /* Dourado para sofisticação */
+  --accent-silver: #a9b7c0; /* Prata para modernidade */
+  --accent-red: #dc2626; /* Vermelho para alertas */
+  --accent-green: #10b981; /* Verde para sucesso */
+
+  /* Cores neutras para texto e elementos */
+  --text-light: #e2e8f0; /* Texto claro em fundos escuros */
+  --text-dark: #2d3748; /* Texto escuro em fundos claros */
+  --border-dark: #4a5568; /* Bordas em fundos escuros */
+  --border-light: #e2e8f0; /* Bordas em fundos claros */
 }
 
-/* Pequenos ajustes para melhorar a aparência */
-body {
-    font-family: var(--bs-font-sans-serif);
-    background-color: #f0f2f5; /* Um fundo um pouco mais escuro para contraste */
+
+/* Configuração base do body */
+@layer base {
+  body {
+    font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--primary-navy); /* Fundo azul marinho */
+    color: var(--text-light); /* Texto claro */
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Poppins", sans-serif;
+    font-weight: 700;
+    line-height: 1.3;
+    /* A CORREÇÃO ESTÁ AQUI: Removemos a cor global */
+  }
+
+  a {
+    color: var(--accent-silver); /* Links em prata */
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+  }
+
+  a:hover {
+    color: var(--primary-light-gray); /* Links mais claros no hover */
+  }
+
+  /* NOVO: Estilos base para formulários para garantir a legibilidade */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="file"],
+  textarea,
+  select {
+    background-color: var(--primary-white); /* Fundo branco/quente */
+    color: var(--text-dark); /* Texto escuro */
+    border: 1px solid var(--border-light);
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: #a0aec0; /* Cinza médio para o placeholder */
+  }
 }
 
-.card {
-    border: none; /* Remove as bordas dos cartões para um look mais moderno */
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+/* Componentes personalizados */
+@layer components {
+  /* Botões personalizados */
+  .btn-primary {
+    @apply bg-primary-blue text-primary-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-primary-gray hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary-blue focus:ring-offset-2 focus:ring-offset-primary-navy transition-all duration-200 transform hover:-translate-y-0.5;
+  }
+
+  .btn-secondary {
+    @apply bg-primary-gray text-primary-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-gray-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary-gray focus:ring-offset-2 focus:ring-offset-primary-navy transition-all duration-200 transform hover:-translate-y-0.5;
+  }
+
+  .btn-success {
+    background-color: var(--accent-green);
+    @apply text-primary-white font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-primary-navy transition-all duration-200 transform hover:-translate-y-0.5;
+  }
+
+  .btn-success:hover {
+    background-color: #059669;
+  }
+
+  /* Cards personalizados */
+  .card-custom {
+    @apply bg-primary-blue rounded-xl shadow-sm border border-border-dark overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-2;
+  }
+
+  .card-hover-effect {
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  }
+
+  .card-hover-effect:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Formulários personalizados */
+  .form-input-custom {
+    @apply w-full px-4 py-3 border border-border-dark rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent transition-all duration-200 bg-primary-gray text-text-light;
+  }
+
+  .form-label-custom {
+    @apply block text-sm font-semibold text-text-light mb-2;
+  }
+
+  /* Alertas personalizados */
+  .alert-success {
+    background-color: rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.3);
+    color: var(--accent-green);
+    @apply border rounded-lg px-4 py-3 mb-4;
+  }
+
+  .alert-error {
+    background-color: rgba(220, 38, 38, 0.1);
+    border-color: rgba(220, 38, 38, 0.3);
+    color: var(--accent-red);
+    @apply border rounded-lg px-4 py-3 mb-4;
+  }
+
+  .alert-warning {
+    background-color: rgba(245, 158, 11, 0.1);
+    border-color: rgba(245, 158, 11, 0.3);
+    color: #f59e0b;
+    @apply border rounded-lg px-4 py-3 mb-4;
+  }
+
+  .alert-info {
+    background-color: rgba(18, 42, 87, 0.1); /* Primary-blue with opacity */
+    border-color: rgba(18, 42, 87, 0.3);
+    color: var(--primary-blue);
+    @apply border rounded-lg px-4 py-3 mb-4;
+  }
+
+  /* Navegação personalizada */
+  .nav-link-custom {
+    @apply text-text-light font-medium hover:text-primary-light-gray transition-colors duration-200 relative;
+  }
+
+  .nav-link-custom.active {
+    @apply text-primary-light-gray;
+  }
+
+  .nav-link-custom.active::after {
+    content: "";
+    @apply absolute bottom-0 left-0 w-full h-0.5 bg-primary-light-gray;
+  }
+
+  /* Sidebar personalizada */
+  .sidebar-link {
+    @apply block px-6 py-4 text-sm font-medium transition-all duration-200 hover:bg-primary-gray hover:text-primary-white;
+  }
+
+  .sidebar-link.active {
+    @apply bg-primary-gray text-primary-white border-r-4 border-accent-gold; /* Dourado para destaque */
+  }
 }
 
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+/* Utilitários personalizados */
+@layer utilities {
+  /* Animações personalizadas */
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+
+  .animate-bounce-in {
+    animation: bounceIn 0.6s ease-out;
+  }
+
+  /* Gradientes personalizados (ajustados para a nova paleta) */
+  .gradient-primary-button {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-gray) 100%);
+  }
+
+  .gradient-accent-header {
+    background: linear-gradient(90deg, var(--primary-blue) 0%, var(--primary-gray) 50%, var(--primary-blue) 100%);
+  }
+
+  /* Text clamp utilities */
+  .line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Scrollbar personalizada */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: var(--primary-gray);
+    border-radius: 3px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--border-dark);
+    border-radius: 3px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--gray-600);
+  }
+
+  /* Loading spinner */
+  .loading-spinner {
+    border: 2px solid var(--border-dark);
+    border-top: 2px solid var(--primary-blue);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+  }
+
+  /* Glassmorphism effect for dark background (adjusted for new palette) */
+  .glass-effect-dark {
+    background: rgba(255, 255, 255, 0.08); /* Slightly more visible white for dark theme */
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.15); /* More prominent subtle white border */
+  }
+
+  /* Subtle Glow text effect (adjusted for new palette) */
+  .glow-text-subtle {
+    text-shadow: 0 0 3px currentColor, 0 0 6px currentColor; /* Less intense glow */
+  }
 }
 
-.btn {
-    font-weight: 600;
+/* Keyframes para animações */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsividade adicional */
+@media (max-width: 768px) {
+  .card-custom {
+    @apply mx-2;
+  }
+
+  .btn-primary,
+  .btn-secondary,
+  .btn-success {
+    @apply py-2 px-4 text-sm;
+  }
+}
+
+/* Melhorias de acessibilidade */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus states melhorados */
+button:focus,
+a:focus,
+input:focus,
+textarea:focus,
+select:focus {
+  outline: 2px solid var(--primary-blue);
+  outline-offset: 2px;
 }
