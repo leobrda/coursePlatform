@@ -5,36 +5,39 @@
 {% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card shadow-sm">
-                <div class="card-header">
-                    <h1 class="h4 mb-0">Avaliação do Curso: {{ quiz.curso.titulo }}</h1>
-                </div>
-                <div class="card-body">
-                    <form method="post" action="{% url 'cursos:submeter_quiz' pk_quiz=quiz.pk %}">
-                        {% csrf_token %}
+<div class="container mx-auto my-8 px-4">
+    <div class="max-w-3xl mx-auto">
+        <div class="bg-white rounded-lg shadow-md">
+            <div class="p-6 border-b">
+                <h1 class="text-2xl font-semibold">Avaliação do Curso</h1>
+                <p class="text-sm text-gray-500 mt-1">{{ quiz.curso.titulo }}</p>
+            </div>
+            <div class="p-6">
+                <form method="post" action="{% url 'cursos:submeter_quiz' pk_quiz=quiz.pk %}">
+                    {% csrf_token %}
 
+                    <div class="space-y-8">
                         {% for pergunta in quiz.perguntas.all %}
-                            <div class="mb-4">
-                                <p class="fw-bold">{{ forloop.counter }}. {{ pergunta.texto }}</p>
-                                {% for opcao in pergunta.opcoes.all %}
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="pergunta_{{ pergunta.id }}" id="opcao_{{ opcao.id }}" value="{{ opcao.id }}">
-                                        <label class="form-check-label" for="opcao_{{ opcao.id }}">
-                                            {{ opcao.texto }}
-                                        </label>
-                                    </div>
-                                {% endfor %}
-                            </div>
+                            <fieldset>
+                                <legend class="text-lg font-medium text-gray-900 mb-4">{{ forloop.counter }}. {{ pergunta.texto }}</legend>
+                                <div class="space-y-3">
+                                    {% for opcao in pergunta.opcoes.all %}
+                                        <div class="flex items-center">
+                                            <input id="opcao_{{ opcao.id }}" name="pergunta_{{ pergunta.id }}" type="radio" value="{{ opcao.id }}" class="focus:ring-primary h-4 w-4 text-primary border-gray-300">
+                                            <label for="opcao_{{ opcao.id }}" class="ml-3 block text-sm font-medium text-gray-700">
+                                                {{ opcao.texto }}
+                                            </label>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </fieldset>
                         {% endfor %}
+                    </div>
 
-                        <div class="d-grid mt-4">
-                            <button type="submit" class="btn btn-primary btn-lg">Finalizar e Ver Resultado</button>
-                        </div>
-                    </form>
-                </div>
+                    <div class="mt-8 border-t pt-6">
+                        <button type="submit" class="w-full bg-primary text-white font-semibold py-3 px-4 rounded-md hover:bg-opacity-90 transition-colors text-lg">Finalizar e Ver Resultado</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

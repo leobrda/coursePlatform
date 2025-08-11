@@ -12,7 +12,7 @@ class UserRegistrationForm(forms.ModelForm):
     email = forms.EmailField(label='Email', required=True)
     biografia = forms.CharField(label='Biografia', widget=forms.Textarea, required=False)
     password = forms.CharField(label='Senha', widget=forms.PasswordInput)
-    password2 = forms.CharField(label='Confirmar Seha', widget=forms.PasswordInput)
+    password2 = forms.CharField(label='Confirmar Senha', widget=forms.PasswordInput)
 
     class Meta:
         model = User

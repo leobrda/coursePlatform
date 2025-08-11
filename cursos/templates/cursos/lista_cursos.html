@@ -1,62 +1,66 @@
 {% extends 'base.html' %}
 
-{% block title %}Nossos Cursos - {{ block.super }}{% endblock %}
+{% block title %}
+    Nossos Cursos - {{ block.super }}
+{% endblock %}
 
 {% block content %}
-<div class="container-fluid px-lg-5">
-    <div class="row">
+<div class="flex flex-col lg:flex-row gap-8">
 
-        <!-- Barra Lateral de Categorias -->
-        <aside class="col-lg-3">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-white">
-                    <h3 class="h5 mb-0">Categorias</h3>
-                </div>
-                <div class="list-group list-group-flush">
-                    <a href="{% url 'home' %}" class="list-group-item list-group-item-action {% if not categoria_selecionada %}active{% endif %}">
+    <!-- Barra Lateral de Categorias -->
+    <aside class="lg:w-1/4 w-full">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold mb-4 border-b pb-2">Categorias</h3>
+            <ul class="space-y-2">
+                <li>
+                    <a href="{% url 'home' %}" class="block px-4 py-2 rounded-md text-gray-700 hover:bg-gray-200 transition-colors {% if not categoria_selecionada %}bg-primary text-white hover:bg-primary{% endif %}">
                         Todos os Cursos
                     </a>
-                    {% for c in categorias %}
-                    <a href="{% url 'lista_cursos_por_categoria' c.slug %}" class="list-group-item list-group-item-action {% if categoria_selecionada.slug == c.slug %}active{% endif %}">
+                </li>
+                {% for c in categorias %}
+                <li>
+                    <a href="{% url 'lista_cursos_por_categoria' c.slug %}" class="block px-4 py-2 rounded-md text-gray-700 hover:bg-gray-200 transition-colors {% if categoria_selecionada.slug == c.slug %}bg-primary text-white hover:bg-primary{% endif %}">
                         {{ c.nome }}
                     </a>
-                    {% endfor %}
-                </div>
-            </div>
-        </aside>
-
-        <!-- Conteúdo Principal dos Cursos -->
-        <main class="col-lg-9">
-            <h2 class="mb-4">
-                {% if categoria_selecionada %}
-                    Cursos em <span class="text-primary">{{ categoria_selecionada.nome }}</span>
-                {% else %}
-                    Cursos Disponíveis
-                {% endif %}
-            </h2>
-
-            <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
-                {% for curso in cursos %}
-                    <div class="col">
-                        <div class="card h-100 shadow-sm">
-                            <img src="{% if curso.imagem_capa %}{{ curso.imagem_capa.url }}{% else %}https://placehold.co/600x400/4A69BD/FFFFFF?text=Curso{% endif %}" class="card-img-top" alt="Capa do curso {{ curso.titulo }}" style="height: 180px; object-fit: cover;">
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title">{{ curso.titulo }}</h5>
-                                <p class="card-text text-muted small flex-grow-1">{{ curso.descricao|truncatewords:20 }}</p>
-                                <a href="{% url 'cursos:detalhe_curso' pk=curso.pk %}" class="btn btn-primary mt-auto">Ver Curso</a>
-                            </div>
-                        </div>
-                    </div>
-                {% empty %}
-                    <div class="col-12">
-                        <div class="alert alert-info text-center">
-                            Nenhum curso encontrado nesta categoria.
-                        </div>
-                    </div>
+                </li>
                 {% endfor %}
-            </div>
-        </main>
+            </ul>
+        </div>
+    </aside>
 
-    </div>
+    <!-- Conteúdo Principal dos Cursos -->
+    <main class="flex-1">
+        <h2 class="text-3xl font-bold mb-6 text-gray-800">
+            {% if categoria_selecionada %}
+                Cursos em <span class="text-primary">{{ categoria_selecionada.nome }}</span>
+            {% else %}
+                Cursos Disponíveis
+            {% endif %}
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+            {% for curso in cursos %}
+                <div class="bg-white rounded-lg shadow-md overflow-hidden card flex flex-col">
+                    <a href="{% url 'cursos:detalhe_curso' pk=curso.pk %}">
+                        <img src="{% if curso.imagem_capa %}{{ curso.imagem_capa.url }}{% else %}https://placehold.co/600x400/4A69BD/FFFFFF?text=Curso{% endif %}" class="w-full h-48 object-cover" alt="Capa do curso {{ curso.titulo }}">
+                    </a>
+                    <div class="p-6 flex flex-col flex-grow">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ curso.titulo }}</h3>
+                        <p class="text-gray-600 text-sm line-clamp-3 flex-grow">{{ curso.descricao|truncatewords:25 }}</p>
+                        <div class="mt-auto pt-4">
+                             <a href="{% url 'cursos:detalhe_curso' pk=curso.pk %}" class="block w-full bg-primary text-white text-center font-semibold py-2 rounded-md hover:bg-opacity-90 transition-colors">Ver Curso</a>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="md:col-span-2 xl:col-span-3">
+                    <div class="bg-white p-8 rounded-lg shadow-md text-center text-gray-500">
+                        Nenhum curso encontrado nesta categoria.
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </main>
+
 </div>
 {% endblock %}

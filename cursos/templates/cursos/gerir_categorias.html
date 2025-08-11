@@ -3,62 +3,62 @@
 {% block title %}Gerir Categorias - {{ block.super }}{% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <div class="row">
+<div class="container mx-auto my-8 px-4">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Coluna para Adicionar Categoria -->
-        <div class="col-lg-4 mb-4">
-            <div class="card shadow-sm">
-                <div class="card-header bg-white">
-                    <h2 class="h5 mb-0">Adicionar Nova Categoria</h2>
-                </div>
-                <div class="card-body">
-                    <form method="post">
-                        {% csrf_token %}
+        <div class="lg:col-span-1">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Adicionar Nova Categoria</h2>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="space-y-4">
                         {% for field in form %}
-                            <div class="mb-3">
-                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                                {{ field }}
+                            <div>
+                                <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ field.label }}</label>
+                                <div class="mt-1">
+                                    {{ field }}
+                                </div>
                                 {% if field.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {{ field.errors|striptags }}
-                                    </div>
+                                    <p class="mt-2 text-sm text-red-600">{{ field.errors|striptags }}</p>
                                 {% endif %}
                             </div>
                         {% endfor %}
-                        <button type="submit" class="btn btn-primary w-100">Adicionar Categoria</button>
-                    </form>
-                </div>
+                    </div>
+                    <div class="mt-6">
+                        <button type="submit" class="w-full bg-primary text-white font-semibold py-2 px-4 rounded-md hover:bg-opacity-90 transition-colors">Adicionar Categoria</button>
+                    </div>
+                </form>
             </div>
         </div>
 
         <!-- Coluna para Listar Categorias Existentes -->
-        <div class="col-lg-8">
-            <div class="card shadow-sm">
-                <div class="card-header bg-white">
-                    <h2 class="h5 mb-0">Categorias Existentes</h2>
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="p-6 border-b">
+                    <h2 class="text-xl font-semibold">Categorias Existentes</h2>
                 </div>
-                <div class="card-body">
+                <div>
                     {% if categorias %}
-                        <ul class="list-group list-group-flush">
+                        <ul class="divide-y divide-gray-200">
                             {% for categoria in categorias %}
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    {{ categoria.nome }}
-                                    <div>
-                                        <a href="{% url 'cursos:editar_categoria' pk_categoria=categoria.pk %}" class="btn btn-outline-secondary btn-sm">Editar</a>
-                                        <a href="{% url 'cursos:apagar_categoria' pk_categoria=categoria.pk %}" class="btn btn-outline-danger btn-sm">Apagar</a>
+                                <li class="p-4 flex justify-between items-center hover:bg-gray-50 transition-colors">
+                                    <span class="font-medium text-gray-800">{{ categoria.nome }}</span>
+                                    <div class="space-x-2">
+                                        <a href="{% url 'cursos:editar_categoria' pk_categoria=categoria.pk %}" class="text-sm bg-gray-200 text-gray-700 font-semibold py-1 px-3 rounded-md hover:bg-gray-300 transition-colors">Editar</a>
+                                        <a href="{% url 'cursos:apagar_categoria' pk_categoria=categoria.pk %}" class="text-sm bg-danger text-white font-semibold py-1 px-3 rounded-md hover:bg-opacity-90 transition-colors">Apagar</a>
                                     </div>
                                 </li>
                             {% endfor %}
                         </ul>
                     {% else %}
-                        <p class="text-muted mb-0">Nenhuma categoria encontrada.</p>
+                        <p class="text-center text-gray-500 p-8">Nenhuma categoria encontrada.</p>
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
-    <div class="mt-4">
-        <a href="{% url 'cursos:painel_instrutor' %}" class="text-decoration-none">&larr; Voltar para o Painel</a>
+    <div class="mt-6">
+        <a href="{% url 'cursos:painel_instrutor' %}" class="font-semibold text-primary hover:underline">&larr; Voltar para o Painel</a>
     </div>
 </div>
 {% endblock %}

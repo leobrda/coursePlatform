@@ -1,51 +1,81 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
-    <div class="container-fluid">
-        <a class="navbar-brand fw-bold" href="{% url 'home' %}">Plataforma de Cursos</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto align-items-center">
+<!-- Barra de Navegação com Tailwind CSS e Menu Móvel Funcional -->
+<nav class="bg-white shadow-md" x-data="{ mobileMenuOpen: false }">
+    <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center py-4">
+            <!-- Logo -->
+            <div>
+                <a href="{% url 'home' %}" class="text-2xl font-bold text-gray-800 hover:text-primary transition-colors">PlataformaDeCursos</a>
+            </div>
+
+            <!-- Links do Menu - Desktop -->
+            <div class="hidden md:flex items-center space-x-6">
                 {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'cursos:lista_topicos' %}">Comunidade</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link position-relative" href="{% url 'cursos:notificacoes' %}">
-                            Notificações
-                            {% if unread_notification_count > 0 %}
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                    {{ unread_notification_count }}
+                    <a href="{% url 'cursos:lista_topicos' %}" class="text-gray-600 hover:text-primary font-medium transition-colors">Comunidade</a>
+
+                    <a href="{% url 'cursos:notificacoes' %}" class="relative text-gray-600 hover:text-primary">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
+                        {% if unread_notification_count > 0 %}
+                            <span class="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
+                                {{ unread_notification_count }}
+                            </span>
+                        {% endif %}
+                    </a>
+
+                    <!-- Menu Dropdown do Utilizador -->
+                    <div class="relative" x-data="{ open: false }" @click.away="open = false">
+                        <button @click="open = !open" class="flex items-center space-x-2 focus:outline-none">
+                            {% if user.is_authenticated and user.associado and user.associado.foto_perfil %}
+                                <img src="{{ user.associado.foto_perfil.url }}" class="h-10 w-10 rounded-full object-cover" alt="Foto de Perfil">
+                            {% else %}
+                                <span class="inline-flex items-center justify-center h-10 w-10 rounded-full bg-primary text-white font-bold">
+                                    {{ user.first_name|first|upper }}
                                 </span>
                             {% endif %}
-                        </a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            {% if user.associado.foto_perfil %}
-                                <img src="{{ user.associado.foto_perfil.url }}" class="rounded-circle me-2" alt="Foto de Perfil" width="32" height="32" style="object-fit: cover;">
-                            {% endif %}
-                            Olá, {{ user.first_name|default:user.username }}!
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                        </button>
+                        <div x-show="open" x-transition class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-xl z-20" style="display: none;">
                             {% if is_org_owner %}
-                                <li><a class="dropdown-item" href="{% url 'cursos:painel_instrutor' %}">Painel do Instrutor</a></li>
+                                <a href="{% url 'cursos:painel_instrutor' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Painel do Instrutor</a>
                             {% else %}
-                                <li><a class="dropdown-item" href="{% url 'cursos:meu_painel' %}">Minha Conta</a></li>
+                                <a href="{% url 'cursos:meu_painel' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Minha Conta</a>
                             {% endif %}
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="{% url 'cursos:logout' %}">Sair</a></li>
-                        </ul>
-                    </li>
+                            <hr>
+                            <a href="{% url 'cursos:logout' %}" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Sair</a>
+                        </div>
+                    </div>
                 {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'cursos:login' %}">Entrar</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="btn btn-primary" href="{% url 'cursos:registrar' %}">Cadastre-se</a>
-                    </li>
+                    <a href="{% url 'cursos:login' %}" class="text-gray-600 hover:text-primary font-medium transition-colors">Entrar</a>
+                    <a href="{% url 'cursos:registrar' %}" class="bg-primary text-white font-semibold px-4 py-2 rounded-md hover:bg-opacity-90 transition-colors">Cadastre-se</a>
                 {% endif %}
-            </ul>
+            </div>
+
+            <!-- Botão do Menu - Mobile -->
+            <div class="md:hidden">
+                <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-gray-600 hover:text-primary focus:outline-none">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Dropdown - Mobile -->
+    <div x-show="mobileMenuOpen" class="md:hidden" style="display: none;">
+        <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+            {% if user.is_authenticated %}
+                <a href="{% url 'cursos:lista_topicos' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-white hover:bg-primary">Comunidade</a>
+                <a href="{% url 'cursos:notificacoes' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-white hover:bg-primary">Notificações</a>
+                {% if is_org_owner %}
+                    <a href="{% url 'cursos:painel_instrutor' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-white hover:bg-primary">Painel do Instrutor</a>
+                {% else %}
+                    <a href="{% url 'cursos:meu_painel' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-white hover:bg-primary">Minha Conta</a>
+                {% endif %}
+                <hr>
+                <a href="{% url 'cursos:logout' %}" class="block px-3 py-2 rounded-md text-base font-medium text-red-600 hover:text-white hover:bg-red-500">Sair</a>
+            {% else %}
+                <a href="{% url 'cursos:login' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-white hover:bg-primary">Entrar</a>
+                <a href="{% url 'cursos:registrar' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-white hover:bg-primary">Cadastre-se</a>
+            {% endif %}
         </div>
     </div>
 </nav>

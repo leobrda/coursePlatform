@@ -5,59 +5,66 @@
 {% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
+<div class="container mx-auto my-8 px-4">
+    <div class="max-w-4xl mx-auto">
 
-            <!-- Secção para Iniciar Nova Discussão -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-header">
-                    <h1 class="h4 mb-0">Iniciar Nova Discussão</h1>
-                </div>
-                <div class="card-body">
-                    <form method="post">
-                        {% csrf_token %}
-                        {% for field in form %}
-                            <div class="mb-3">
-                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+        <!-- Secção para Iniciar Nova Discussão -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h1 class="text-2xl font-semibold mb-4">Iniciar Nova Discussão</h1>
+            <form method="post">
+                {% csrf_token %}
+                <div class="space-y-4">
+                    {% for field in form %}
+                        <div>
+                            <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ field.label }}</label>
+                            <div class="mt-1">
                                 {{ field }}
-                                {% if field.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {{ field.errors|striptags }}
-                                    </div>
-                                {% endif %}
                             </div>
-                        {% endfor %}
-                        <button type="submit" class="btn btn-primary">Publicar Tópico</button>
-                    </form>
+                            {% if field.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ field.errors|striptags }}</p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
                 </div>
-            </div>
-
-            <!-- Secção de Tópicos Recentes -->
-            <div class="card shadow-sm">
-                <div class="card-header">
-                    <h2 class="h5 mb-0">Tópicos Recentes</h2>
+                <div class="mt-6">
+                    <button type="submit" class="w-full bg-primary text-white font-semibold py-2 px-4 rounded-md hover:bg-opacity-90 transition-colors">Publicar Tópico</button>
                 </div>
-                <div class="card-body">
-                    {% if topicos %}
-                        <ul class="list-group list-group-flush">
-                            {% for topico in topicos %}
-                                <a href="{% url 'cursos:detalhe_topico' pk_topico=topico.pk %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-1">{{ topico.titulo }}</h6>
-                                        <small class="text-muted">Iniciado por {{ topico.autor.first_name }}, em {{ topico.data_criacao|date:"d/m/Y" }}</small>
-                                    </div>
-                                    <span class="badge bg-primary rounded-pill">{{ topico.comentarios.count }}</span>
-                                </a>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p class="text-muted text-center p-3">Nenhum tópico de discussão foi criado ainda. Seja o primeiro!</p>
-                    {% endif %}
-                </div>
-            </div>
-
+            </form>
         </div>
+
+        <!-- Secção de Tópicos Recentes -->
+        <div class="bg-white rounded-lg shadow-md">
+            <div class="p-6 border-b">
+                <h2 class="text-2xl font-semibold">Tópicos Recentes</h2>
+            </div>
+            <div>
+                {% if topicos %}
+                    <ul class="divide-y divide-gray-200">
+                        {% for topico in topicos %}
+                            <li class="hover:bg-gray-50 transition-colors">
+                                <a href="{% url 'cursos:detalhe_topico' pk_topico=topico.pk %}" class="block p-4">
+                                    <div class="flex justify-between items-center">
+                                        <div>
+                                            <p class="font-semibold text-primary">{{ topico.titulo }}</p>
+                                            <p class="text-sm text-gray-500 mt-1">
+                                                Iniciado por {{ topico.autor.first_name }}, em {{ topico.data_criacao|date:"d/m/Y" }}
+                                            </p>
+                                        </div>
+                                        <div class="text-center">
+                                            <p class="font-bold text-gray-800">{{ topico.comentarios.count }}</p>
+                                            <p class="text-sm text-gray-500">respostas</p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-center text-gray-500 p-8">Nenhum tópico de discussão foi criado ainda. Seja o primeiro!</p>
+                {% endif %}
+            </div>
+        </div>
+
     </div>
 </div>
 {% endblock %}

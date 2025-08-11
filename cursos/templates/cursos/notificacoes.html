@@ -5,46 +5,62 @@
 {% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card shadow-sm">
-                <div class="card-header">
-                    <h1 class="h4 mb-0">Minhas Notificações</h1>
-                </div>
-                <div class="card-body">
-                    {% if notificacoes %}
-                        <div class="list-group list-group-flush">
-                            {% for notificacao in notificacoes %}
+<div class="container mx-auto my-8 px-4">
+    <div class="max-w-3xl mx-auto">
+        <div class="bg-white rounded-lg shadow-md">
+            <div class="p-6 border-b">
+                <h1 class="text-2xl font-semibold">Minhas Notificações</h1>
+            </div>
+            <div>
+                {% if notificacoes %}
+                    <ul class="divide-y divide-gray-200">
+                        {% for notificacao in notificacoes %}
+                            <li class="hover:bg-gray-50 transition-colors">
                                 {% if notificacao.resposta %}
                                     <!-- Notificação sobre uma RESPOSTA -->
-                                    <a href="{% url 'cursos:ver_aula' pk=notificacao.resposta.pergunta.aula.pk %}" class="list-group-item list-group-item-action">
-                                        <div class="d-flex w-100 justify-content-between">
-                                            <p class="mb-1">
-                                                <strong>{{ notificacao.resposta.usuario.first_name }}</strong> respondeu à sua pergunta.
-                                            </p>
-                                            <small class="text-muted">{{ notificacao.data_criacao|date:"d/m/Y" }}</small>
+                                    <a href="{% url 'cursos:ver_aula' pk=notificacao.resposta.pergunta.aula.pk %}" class="block p-4">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 mr-4">
+                                                {% if notificacao.resposta.usuario.associado.foto_perfil %}
+                                                    <img src="{{ notificacao.resposta.usuario.associado.foto_perfil.url }}" class="h-12 w-12 rounded-full object-cover" alt="Avatar">
+                                                {% else %}
+                                                    <span class="inline-flex items-center justify-center h-12 w-12 rounded-full bg-primary text-white font-bold text-xl">{{ notificacao.resposta.usuario.first_name|first|upper }}</span>
+                                                {% endif %}
+                                            </div>
+                                            <div class="flex-grow">
+                                                <p class="text-gray-800">
+                                                    <strong>{{ notificacao.resposta.usuario.first_name }}</strong> respondeu à sua pergunta na aula <strong>"{{ notificacao.resposta.pergunta.aula.titulo }}"</strong>.
+                                                </p>
+                                                <p class="text-sm text-gray-500 mt-1">{{ notificacao.data_criacao|date:"d/m/Y, H:i" }}</p>
+                                            </div>
                                         </div>
-                                        <p class="mb-1 text-muted small">Na aula: "{{ notificacao.resposta.pergunta.aula.titulo }}"</p>
                                     </a>
                                 {% elif notificacao.pergunta %}
                                     <!-- Notificação sobre uma PERGUNTA -->
-                                    <a href="{% url 'cursos:ver_aula' pk=notificacao.pergunta.aula.pk %}" class="list-group-item list-group-item-action">
-                                        <div class="d-flex w-100 justify-content-between">
-                                            <p class="mb-1">
-                                                <strong>{{ notificacao.pergunta.usuario.first_name }}</strong> fez uma nova pergunta.
-                                            </p>
-                                            <small class="text-muted">{{ notificacao.data_criacao|date:"d/m/Y" }}</small>
+                                    <a href="{% url 'cursos:ver_aula' pk=notificacao.pergunta.aula.pk %}" class="block p-4">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 mr-4">
+                                                {% if notificacao.pergunta.usuario.associado.foto_perfil %}
+                                                    <img src="{{ notificacao.pergunta.usuario.associado.foto_perfil.url }}" class="h-12 w-12 rounded-full object-cover" alt="Avatar">
+                                                {% else %}
+                                                    <span class="inline-flex items-center justify-center h-12 w-12 rounded-full bg-primary text-white font-bold text-xl">{{ notificacao.pergunta.usuario.first_name|first|upper }}</span>
+                                                {% endif %}
+                                            </div>
+                                            <div class="flex-grow">
+                                                <p class="text-gray-800">
+                                                    <strong>{{ notificacao.pergunta.usuario.first_name }}</strong> fez uma nova pergunta na aula <strong>"{{ notificacao.pergunta.aula.titulo }}"</strong>.
+                                                </p>
+                                                <p class="text-sm text-gray-500 mt-1">{{ notificacao.data_criacao|date:"d/m/Y, H:i" }}</p>
+                                            </div>
                                         </div>
-                                        <p class="mb-1 text-muted small">Na aula: "{{ notificacao.pergunta.aula.titulo }}"</p>
                                     </a>
                                 {% endif %}
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <p class="text-center text-muted p-3">Você não tem nenhuma notificação.</p>
-                    {% endif %}
-                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-center text-gray-500 p-8">Você não tem nenhuma notificação.</p>
+                {% endif %}
             </div>
         </div>
     </div>
