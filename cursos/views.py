@@ -81,14 +81,26 @@ def detalhe_curso(request, pk):
 
     aulas_do_curso_count = curso.aulas.count()
     aulas_concluidas_count = 0
+    resultado_quiz = None
+    tentativas_restantes = 0
+
     if request.user.is_authenticated and hasattr(request.user, 'associado'):
         associado = request.user.associado
         aulas_concluidas_count = associado.aulas_concluidas.filter(curso=curso).count()
+
+        if hasattr(curso, 'quiz'):
+            resultado_quiz = ResultadoQuiz.objects.filter(associado=associado, quiz=curso.quiz).first()
+            if resultado_quiz:
+                tentativas_restantes = curso.quiz.max_tentativas - resultado_quiz.tentativas
+            else:
+                tentativas_restantes = curso.quiz.max_tentativas
 
     context = {
         'curso': curso,
         'aulas_do_curso_count': aulas_do_curso_count,
         'aulas_concluidas_count': aulas_concluidas_count,
+        'resultado_quiz': resultado_quiz,
+        'tentativas_restantes': tentativas_restantes,
     }
 
     return render(request, 'cursos/detalhe_curso.html', context=context)
@@ -644,14 +656,23 @@ def fazer_quiz(request, pk_curso):
     curso = get_object_or_404(Curso, pk=pk_curso)
     quiz = get_object_or_404(Quiz, curso=curso)
     associado = get_object_or_404(Associado, usuario=request.user)
+
     aulas_do_curso_count = curso.aulas.count()
     aulas_concluidas_count = associado.aulas_concluidas.filter(curso=curso).count()
-
     if aulas_do_curso_count == 0 or aulas_do_curso_count != aulas_concluidas_count:
         return HttpResponseForbidden('Você precisa de concluir todas as aulas antes de fazer a avaliação.')
 
+    resultado_anterior, created = ResultadoQuiz.objects.get_or_create(
+        associado=associado,
+        quiz=quiz,
+        defaults={'pontuacao': 0, 'tentativas': 0}
+    )
+    if resultado_anterior.tentativas >= quiz.max_tentativas:
+        return render(request, 'cursos/resultado_quiz.html', {'resultado': resultado_anterior})
+
     context = {
         'quiz': quiz,
+        'tentativas_restantes': quiz.max_tentativas - resultado_anterior.tentativas
     }
 
     return render(request, 'cursos/fazer_quiz.html', context=context)
@@ -678,15 +699,18 @@ def submeter_quiz(request, pk_quiz):
 
         pontuacao = (respostas_corretas / total_perguntas) * 100 if total_perguntas > 0 else 0
 
-        resultado, created = ResultadoQuiz.objects.update_or_create(
+        resultado, created = ResultadoQuiz.objects.get_or_create(
             associado=associado,
             quiz=quiz,
-            defaults={'pontuacao': pontuacao}
+            defaults={'pontuacao': 0, 'tentivas': 0}
         )
+        resultado.tentativas += 1
+        resultado.pontuacao = pontuacao
+        resultado.save()
 
-        contexto = {
+        context = {
             'resultado': resultado,
         }
-        return render(request, 'cursos/resultado_quiz.html', contexto)
+        return render(request, 'cursos/resultado_quiz.html', context=context)
 
     return redirect('cursos:detalhe_curso', pk=quiz.curso.pk)

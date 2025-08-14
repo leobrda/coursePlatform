@@ -176,6 +176,7 @@ class ComentarioTopico(models.Model):
 class Quiz(models.Model):
     curso = models.OneToOneField(Curso, on_delete=models.CASCADE, related_name='quiz')
     titulo = models.CharField(max_length=255, verbose_name='Título do Quiz')
+    max_tentativas = models.PositiveIntegerField(default=3, verbose_name='Máximo de Tentativas')
 
     class Meta:
         verbose_name_plural = 'Quizzes'
@@ -206,6 +207,7 @@ class ResultadoQuiz(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
     pontuacao = models.FloatField()
     data_realizacao = models.DateTimeField(auto_now_add=True)
+    tentativas = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return f'Resultado de {self.associado.usuario.username} no {self.quiz.titulo}'
