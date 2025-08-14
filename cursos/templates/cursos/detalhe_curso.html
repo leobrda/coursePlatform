@@ -63,15 +63,45 @@
             </div>
         </div>
 
-        <!-- Secção da Avaliação Final -->
+        <!-- ########## SECÇÃO DA AVALIAÇÃO FINAL (AGORA 100% CORRIGIDA) ########## -->
         <div class="lg:w-1/3 w-full">
             {% if user.is_authenticated and user.associado and curso in user.associado.cursos_inscritos.all and curso.quiz %}
                 <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-2xl font-semibold mb-4">Avaliação Final</h2>
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-800">Avaliação Final</h2>
+
                     {% if aulas_do_curso_count > 0 and aulas_do_curso_count == aulas_concluidas_count %}
-                        <p class="text-gray-600 mb-4">Parabéns! Você concluiu todas as aulas deste curso.</p>
-                        <a href="{% url 'cursos:fazer_quiz' pk_curso=curso.pk %}" class="w-full block text-center bg-success text-white font-semibold py-3 rounded-md hover:bg-opacity-90 transition-colors">Fazer a Avaliação Final</a>
+                        <!-- O utilizador completou todas as aulas, agora verificamos o status do quiz -->
+
+                        {% if resultado_quiz and resultado_quiz.pontuacao >= 70 %}
+                            <!-- Caso 1: Já foi aprovado -->
+                            <div class="text-center text-success">
+                                <h3 class="text-xl font-semibold">Parabéns, você foi aprovado!</h3>
+                                <p class="text-4xl font-bold my-2">{{ resultado_quiz.pontuacao|floatformat:0 }}%</p>
+                            </div>
+
+                        {% elif resultado_quiz and resultado_quiz.tentativas >= curso.quiz.max_tentativas %}
+                            <!-- Caso 2: Esgotou as tentativas -->
+                             <div class="text-center text-danger">
+                                <h3 class="text-xl font-semibold">Tentativas Esgotadas</h3>
+                                <p class="mt-2">A sua última nota foi <strong>{{ resultado_quiz.pontuacao|floatformat:0 }}%</strong>.</p>
+                                <p class="text-sm text-gray-600">Por favor, entre em contato com o instrutor.</p>
+                            </div>
+
+                        {% else %}
+                            <!-- Caso 3: Pode fazer o quiz -->
+                            <p class="text-gray-600 mb-4">Você concluiu todas as aulas e já pode fazer a avaliação final.</p>
+                            <a href="{% url 'cursos:fazer_quiz' pk_curso=curso.pk %}" class="w-full block text-center bg-success text-white font-semibold py-3 rounded-md hover:bg-opacity-90 transition-colors">Fazer a Avaliação Final</a>
+                            {% if resultado_quiz %}
+                                <div class="mt-3 text-sm text-gray-500">
+                                    <p>Sua última nota: <strong>{{ resultado_quiz.pontuacao|floatformat:0 }}%</strong></p>
+                                    <!-- AQUI ESTÁ A CORREÇÃO: Usamos a nossa nova variável simples -->
+                                    <p>Tentativas restantes: <strong>{{ tentativas_restantes }}</strong></p>
+                                </div>
+                            {% endif %}
+                        {% endif %}
+
                     {% else %}
+                        <!-- O utilizador ainda não completou as aulas -->
                         <p class="text-gray-500">Você precisa de concluir todas as {{ aulas_do_curso_count }} aulas do curso para desbloquear a avaliação final. Você já completou {{ aulas_concluidas_count }}.</p>
                     {% endif %}
                 </div>

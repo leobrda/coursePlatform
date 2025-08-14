@@ -8,9 +8,12 @@
 <div class="container mx-auto my-8 px-4">
     <div class="max-w-3xl mx-auto">
         <div class="bg-white rounded-lg shadow-md">
-            <div class="p-6 border-b">
-                <h1 class="text-2xl font-semibold">Avaliação do Curso</h1>
+            <div class="p-6 border-b flex justify-between items-center">
+                <h1 class="text-2xl font-semibold text-gray-800">Avaliação do Curso</h1>
                 <p class="text-sm text-gray-500 mt-1">{{ quiz.curso.titulo }}</p>
+            </div>
+            <div class="p-4 bg-blue-50 text-center">
+                <p class="font-semibold text-blue-800">Você tem <span class="text-2xl font-bold">{{ tentativas_restantes }}</span> tentativa{{ tentativas_restantes|pluralize }} restante{{ tentativas_restantes|pluralize }}.</p>
             </div>
             <div class="p-6">
                 <form method="post" action="{% url 'cursos:submeter_quiz' pk_quiz=quiz.pk %}">
