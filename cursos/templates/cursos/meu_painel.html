@@ -25,6 +25,9 @@
                 <button @click="tab = 'respostas'" :class="{ 'border-primary text-primary': tab === 'respostas', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': tab !== 'respostas' }" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
                     Minhas Respostas
                 </button>
+                <button @click="tab = 'resultados'" :class="{ 'border-primary text-primary': tab === 'resultados', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': tab !== 'resultados' }" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                    Meus Resultados
+                </button
             </nav>
         </div>
 
@@ -111,6 +114,30 @@
                         <li class="py-3 text-gray-500">Você ainda não deu nenhuma resposta.</li>
                     {% endfor %}
                 </ul>
+            </div>
+
+            <!-- Aba 5: Meus Resultados -->
+            <div x-show="tab === 'resultados'" style="display: none;">
+                <h2 class="text-2xl font-semibold mb-4">Meus Resultados das Avaliações</h2>
+                <div class="space-y-4">
+                    {% for resultado in resultado_quizzes %}
+                        <div class="p-4 border rounded-lg flex justify-between items-center">
+                            <div>
+                                <h3 class="font-semibold text-lg">{{ resultado.quiz.curso.titulo }}</h3>
+                                <p class="text-sm text-gray-500">Realizado em: {{ resultado.data_realizacao|date:"d/m/Y" }}</p>
+                            </div>
+                            <div>
+                                {% if resultado.pontuacao >= 70 %}
+                                    <span class="text-2xl font-bold text-green-600">{{ resultado.pontuacao|floatformat:0 }}% (Aprovado)</span>
+                                {% else %}
+                                    <span class="text-2xl font-bold text-red-600">{{ resultado.pontuacao|floatformat:0 }}% (Reprovado)</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p class="text-center text-gray-500 py-8">Você ainda não concluiu nenhuma avaliação.</p>
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </div>
