@@ -178,7 +178,7 @@ def meu_painel(request):
         'minhas_perguntas': minhas_perguntas,
         'minhas_respostas': minhas_respostas,
         'meus_cursos': meus_cursos_inscritos,
-        'data_realizacao': resultado_quizzes,
+        'resultado_quizzes': resultado_quizzes,
     }
 
     return render(request, 'cursos/meu_painel.html', context=context)
