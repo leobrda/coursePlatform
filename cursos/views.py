@@ -171,12 +171,14 @@ def meu_painel(request):
     minhas_perguntas = Pergunta.objects.filter(usuario=request.user)
     minhas_respostas = Resposta.objects.filter(usuario=request.user)
     meus_cursos_inscritos = associado.cursos_inscritos.all()
+    resultado_quizzes = ResultadoQuiz.objects.filter(associado=associado).order_by('-data_realizacao')
 
     context = {
         'form': form,
         'minhas_perguntas': minhas_perguntas,
         'minhas_respostas': minhas_respostas,
         'meus_cursos': meus_cursos_inscritos,
+        'data_realizacao': resultado_quizzes,
     }
 
     return render(request, 'cursos/meu_painel.html', context=context)
