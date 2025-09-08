@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.text import slugify
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.db.models import Count
 from django.db.models.functions import Coalesce
 
@@ -28,6 +30,20 @@ class Associado(models.Model):
 
     def __str__(self):
         return self.usuario.username
+
+
+class PerfilInstrutor(models.Model):
+    usuario = models.OneToOneField(User, on_delete=models.CASCADE, related_name='perfil_instrutor', verbose_name='Usuário')
+    foto_perfil = models.ImageField(upload_to='instrutores/fotos/', blank=True, null=True, verbose_name='Foto de Perfil')
+    biografia = models.TextField(blank=True, verbose_name='Biografia do Instrutor')
+
+    def __str__(self):
+        return f'Perfil de {self.usuario.username}'
+
+@receiver(post_save, sender=Organizacao)
+def criar_ou_atualizar_perfil_instrutor(sender, instance, created, **kwargs):
+    if instance.dono:
+        PerfilInstrutor.objects.get_or_create(usuario=instance.dono)
 
 
 class Categoria(models.Model):
@@ -211,3 +227,4 @@ class ResultadoQuiz(models.Model):
 
     def __str__(self):
         return f'Resultado de {self.associado.usuario.username} no {self.quiz.titulo}'
+
