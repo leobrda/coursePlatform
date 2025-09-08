@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .forms import UserRegistrationForm, UserEditForm, PerguntaForm, RespostaForm, CursoForm, AulaForm, CategoriaForm, TopicoDiscussaoForm, ComentarioTopicoForm, PerguntaQuizForm, OpcaoRespostaForm
+from .forms import UserRegistrationForm, UserEditForm, InstrutorEditForm, PerguntaForm, RespostaForm, CursoForm, AulaForm, CategoriaForm, TopicoDiscussaoForm, ComentarioTopicoForm, PerguntaQuizForm, OpcaoRespostaForm
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.http import Http404, HttpResponseForbidden
-from .models import Curso, Aula, Pergunta, Resposta, Associado, Categoria, Notificacao, Organizacao, TopicoDiscussao, ComentarioTopico, Quiz, PerguntaQuiz, OpcaoResposta, ResultadoQuiz
+from .models import Curso, Aula, Pergunta, Resposta, Associado, Categoria, Notificacao, Organizacao, TopicoDiscussao, \
+    ComentarioTopico, Quiz, PerguntaQuiz, OpcaoResposta, ResultadoQuiz, PerfilInstrutor
 
 
 def get_user_organization(request):
@@ -242,6 +243,17 @@ def painel_instrutor(request):
     except Organizacao.DoesNotExist:
         raise Http404
 
+    perfil_instrutor, created = PerfilInstrutor.objects.get_or_create(usuario=request.user)
+
+    if request.method == 'POST':
+        form = InstrutorEditForm(request.POST, request.FILES, instance=request.user, perfil=perfil_instrutor)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'O seu perfil foi atualizado com sucesso!')
+            return redirect('cursos:painel_instrutor')
+    else:
+        form = InstrutorEditForm(instance=request.user, perfil=perfil_instrutor)
+
     total_associados = Associado.objects.filter(organizacao=organizacao).count()
     total_cursos = Curso.objects.filter(organizacao=organizacao).count()
 
@@ -254,6 +266,7 @@ def painel_instrutor(request):
         'total_cursos': total_cursos,
         'associados_pendentes': associados_pendentes,
         'cursos': cursos_da_organizacao,
+        'form': form,
     }
 
     return render(request, 'cursos/painel_instrutor.html', context=context)

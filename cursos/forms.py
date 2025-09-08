@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.forms import inlineformset_factory, BaseInlineFormSet
 
-from .models import Associado, Pergunta, Resposta, Organizacao, Curso, Categoria, Aula, TopicoDiscussao, ComentarioTopico, PerguntaQuiz, OpcaoResposta
+from .models import Associado, PerfilInstrutor, Pergunta, Resposta, Organizacao, Curso, Categoria, Aula, TopicoDiscussao, ComentarioTopico, PerguntaQuiz, OpcaoResposta
 import re
 
 
@@ -68,6 +68,35 @@ class UserEditForm(forms.ModelForm):
             if commit:
                 user.associado.save()
 
+        return user
+
+
+class InstrutorEditForm(forms.ModelForm):
+    first_name = forms.CharField(label='Nome', max_length=150, required=True)
+    last_name = forms.CharField(label='Sobrenome', max_length=150, required=True)
+    email = forms.EmailField(label='Email', required=True)
+    foto_perfil = forms.ImageField(label='Foto de Perfil', required=False)
+    biografia = forms.CharField(label='Biografia', widget=forms.Textarea, required=False)
+
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'email')
+
+    def __init__(self, *args, **kwargs):
+        self.perfil = kwargs.pop('perfil', None)
+        super().__init__(*args, **kwargs)
+
+        if self.perfil:
+            self.fields['foto_perfil'].initial = self.perfil.foto_perfil
+            self.fields['biografia'].initial = self.perfil.biografia
+
+    def save(self, commit=True):
+        user = super().save(commit=commit)
+        if self.perfil:
+            self.perfil.foto_perfil = self.cleaned_data.get('foto_perfil')
+            self.perfil.biografia = self.cleaned_data.get('biografia')
+            if commit:
+                self.perfil.save()
         return user
 
 
